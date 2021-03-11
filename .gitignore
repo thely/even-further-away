@@ -1,0 +1,8 @@
+client.js
+node_modules
+lib
+.DS_Store
+old
+.env
+
+client.js.tmp-*

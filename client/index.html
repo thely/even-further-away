@@ -2,35 +2,39 @@
 <html>
   <head>
     <title>Socket.IO chat</title>
-    <style>
-      body { margin: 0; padding-bottom: 3rem; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
-
-      #form { background: rgba(0, 0, 0, 0.15); padding: 0.25rem; position: fixed; bottom: 0; left: 0; right: 0; display: flex; height: 3rem; box-sizing: border-box; backdrop-filter: blur(10px); }
-      #input { border: none; padding: 0 1rem; flex-grow: 1; border-radius: 2rem; margin: 0.25rem; }
-      #input:focus { outline: none; }
-      #form > button { background: #333; border: none; padding: 0 1rem; margin: 0.25rem; border-radius: 3px; outline: none; color: #fff; }
-
-      #messages { list-style-type: none; margin: 0; padding: 0; }
-      #messages > li { padding: 0.5rem 1rem; }
-      #messages > li:nth-child(odd) { background: #efefef; }
-      .pot { width: 100%; }
-      .pot input { width: 60%; }
-    </style>
+    <link href="./client.css" rel="stylesheet">
   </head>
   <body>
-    <button class="initialize">Initialize audio</button>
-    <!-- <div class="start">the start button</div> -->
-    <button class="startRecord">Record</button>
-    <button class="stopRecord">Stop</button>
-    <div class="pot pot-master">
-      <input type="range" id="master" name="master" min="-80" max="6" step="0.5" value="0" >
-      <label for="master">Master</label>
+    <div class="page-wrap">
+      <div class="section section-status">
+        <button class="initialize">Enable microphone</button>
+        <span class="user-count">Users: 1</span>
+      </div>
+      
+      <!-- <div class="start">the start button</div> -->
+      <div class="section section-metering">
+        <div class="pot pot-master">
+          <input type="range" id="master" name="master" min="-80" max="6" step="0.5" value="0" >
+          <label for="master">Master</label>
+          <ul class="user-meters">
+            <li class="single-meter"><span class="inner"></span></li>
+          </ul>
+        </div>
+        <div class="button button-mute">
+          <input type="checkbox" id="mute" name="mute">
+          <label for="mute">Mute</label>
+        </div>
+      </div>
+      
+      <!-- <div class="clipsZone"></div> -->
+      <div class="section section-watson">
+        <button class="startRecord">Record</button>
+        <button class="stopRecord">Stop</button>
+        <div class="textsZone"></div>
+      </div>
     </div>
-    <div class="button button-mute">
-      <input type="checkbox" id="mute" name="mute">
-      <label for="mute">Mute</label>
-    </div>
-    <div class="clipsZone"></div>
+    
+    
     <!-- <div class="pot pot-harmon">
       <input type="range" id="harmonicity" name="harmonicity" min="0" max="10" step="0.05">
       <label for="volume">Harmonicity<span>: </span></label>
