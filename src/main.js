@@ -1,3 +1,4 @@
+require("dotenv").config();
 import * as Tone from 'tone';
 import { newSynth, playSound } from "./synth.js";
 import { randomInRange, linspace } from "./utils.js";
@@ -5,7 +6,7 @@ import { handleRecording } from "./record.js";
 
 const Pitchfinder = require("pitchfinder");
 const io = require('socket.io-client');
-var socket = io("http://localhost:8000");
+var socket = io(process.env.SOCKET_URL);
 const detectPitch = new Pitchfinder.YIN();
 const p5Start = require("./visuals.js");
 
