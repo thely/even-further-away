@@ -8,7 +8,7 @@ const Pitchfinder = require("pitchfinder");
 const io = require('socket.io-client');
 var socket = io(process.env.SOCKET_URL);
 const detectPitch = new Pitchfinder.YIN();
-const p5Start = require("./visuals.js");
+// const p5Start = require("./visuals.js");
 
 let notes = ["C", "D", "E", "F", "G", "A"];
 
