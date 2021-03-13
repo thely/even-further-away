@@ -1,13 +1,24 @@
 import * as Tone from 'tone';
+const { detect } = require('detect-browser');
 
 let record = document.querySelector(".startRecord");
 let endRecord = document.querySelector(".stopRecord");
 
+function setMimeType() {
+  const browser = detect();
+  if (browser.name == 'firefox') {
+    return "audio/ogg;codecs=opus";
+  } else {
+    return "audio/webm";
+  }
+}
+
 function handleRecording(source, socket) {
+  let codec = setMimeType();
   console.log("inside handleRecording");
   let streamDestination = Tone.getContext().createMediaStreamDestination();
   source.connect(streamDestination);
-  let mediaRecorder = new MediaRecorder(streamDestination.stream, { mimeType: "audio/ogg;codecs=opus"});
+  let mediaRecorder = new MediaRecorder(streamDestination.stream, { mimeType: codec});
   let chunks = [];
 
   record.onclick = function() {
@@ -26,7 +37,7 @@ function handleRecording(source, socket) {
     // document.querySelector(".clipsZone").appendChild(audio);
     audio.controls = true;
     
-    let blob = new Blob(chunks, { 'type': 'audio/ogg; codecs=opus' });
+    let blob = new Blob(chunks, { 'type': codec });
     chunks = [];
     audio.src = URL.createObjectURL(blob);
     // console.log(audio.src);

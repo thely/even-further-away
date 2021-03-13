@@ -153,13 +153,18 @@ function handleMic() {
 // Controls
 // ~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-
 
+document.querySelector(".init-audio").addEventListener("click", () => {
+  console.log("initialized!");
+  Tone.context.resume();
+}, { once: true });
+
 let micInterval = null;
 document.querySelector(".initialize").addEventListener("click", () => {
   if (mic.state == "stopped") {
+    Tone.context.resume();
     mic.open().then(() => {
       handleRecording(mult, socket);
       micInterval = setInterval(handleMic, 100);
-      // recSet = [];
     }).catch(e => {
       console.log("something failed");
       console.log(e);
