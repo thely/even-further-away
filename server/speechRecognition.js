@@ -1,6 +1,17 @@
 require("dotenv").config();
 const SpeechToTextV1 = require('ibm-watson/speech-to-text/v1');
 const { IamAuthenticator } = require('ibm-watson/auth');
+// const { detect } = require('detect-browser');
+
+// function setMimeType() {
+//   const browser = detect();
+//   if (browser.name == 'firefox') {
+//     return "audio/ogg;codecs=opus";
+//   } else {
+//     return "audio/webm";
+//   }
+// }
+
 
 const speeTex = new SpeechToTextV1({
   authenticator: new IamAuthenticator({
@@ -14,8 +25,8 @@ const speeTex = new SpeechToTextV1({
 
 async function speechToText(blob) {
   const recognizeParams = {
-    audio: blob,
-    contentType: 'audio/ogg;codecs=opus',
+    audio: blob.blob,
+    contentType: blob.codec,
     wordAlternativesThreshold: 0.9,
     // keywords: ['colorado', 'tornado', 'tornadoes'],
     // keywordsThreshold: 0.5,

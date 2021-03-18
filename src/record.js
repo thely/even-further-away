@@ -15,6 +15,7 @@ function setMimeType() {
 
 function handleRecording(source, socket) {
   let codec = setMimeType();
+  console.log(codec);
   console.log("inside handleRecording");
   let streamDestination = Tone.getContext().createMediaStreamDestination();
   source.connect(streamDestination);
@@ -38,10 +39,11 @@ function handleRecording(source, socket) {
     audio.controls = true;
     
     let blob = new Blob(chunks, { 'type': codec });
+    let retval = { blob: blob, codec: codec };
     chunks = [];
     audio.src = URL.createObjectURL(blob);
     // console.log(audio.src);
-    socket.emit("speechRecognition", blob);
+    socket.emit("speechRecognition", retval);
   }
 
   mediaRecorder.ondataavailable = function(e) {
