@@ -170,10 +170,10 @@ document.querySelector(".initialize").addEventListener("click", () => {
   }
 });
 
-document.querySelector("#master").addEventListener("change", (e) => {
-  Tone.getDestination().volume.rampTo(e.target.value, 0.1, Tone.context.currentTime);
-});
+// document.querySelector("#master").addEventListener("change", (e) => {
+//   Tone.getDestination().volume.rampTo(e.target.value, 0.1, Tone.context.currentTime);
+// });
 
-document.querySelector("#mute").addEventListener("change", (e) => {
-  SELF_MUTE = e.target.checked;
-});
+// document.querySelector("#mute").addEventListener("change", (e) => {
+//   SELF_MUTE = e.target.checked;
+// });

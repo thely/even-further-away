@@ -51,3 +51,12 @@ button {
   /* font: 16px "Helvetica"; */
   padding: 1em;
 }
+
+button:active {
+  background-color: #71e0ec;
+}
+
+.user-count {
+  float: right;
+  font-size: 12px;
+}

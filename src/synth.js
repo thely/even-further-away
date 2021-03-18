@@ -23,15 +23,15 @@ function playSound(msg, sound) {
     synth.triggerRelease(Tone.context.currentTime);
   }
 
-  updateMeter(sound.meter);
+  // updateMeter(sound.meter);
 }
 
-let mInner = document.querySelector(".single-meter .inner");
-function updateMeter(meter) {
-  // console.log(meter.getValue());
-  let val = rangeScale(meter.getValue()*100, 0.0, 7.0, 0.0, 1.0);
-  mInner.style.width = `${val}%`;
-}
+// let mInner = document.querySelector(".single-meter .inner");
+// function updateMeter(meter) {
+//   // console.log(meter.getValue());
+//   let val = rangeScale(meter.getValue()*100, 0.0, 7.0, 0.0, 1.0);
+//   mInner.style.width = `${val}%`;
+// }
 
 function rangeScale(input, oldmin, oldmax, newmin, newmax) {
   let percent = (input - oldmin) / (oldmax - oldmin);
