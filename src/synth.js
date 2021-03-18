@@ -28,7 +28,7 @@ function playSound(msg, sound) {
 
 let mInner = document.querySelector(".single-meter .inner");
 function updateMeter(meter) {
-  console.log(meter.getValue());
+  // console.log(meter.getValue());
   let val = rangeScale(meter.getValue()*100, 0.0, 7.0, 0.0, 1.0);
   mInner.style.width = `${val}%`;
 }
