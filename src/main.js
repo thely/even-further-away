@@ -8,7 +8,7 @@ const Pitchfinder = require("pitchfinder");
 const io = require('socket.io-client');
 var socket = io(process.env.SOCKET_URL);
 const detectPitch = new Pitchfinder.YIN();
-// const p5Start = require("./visuals.js");
+const p5Start = require("./visuals.js");
 
 let notes = ["C", "D", "E", "F", "G", "A"];
 
@@ -44,7 +44,7 @@ socket.on("selfConnect", (ids) => {
   }
   readjustPan(-1, 1, Tone.context.currentTime);
   updateUserCount(users);
-  // p5Start();
+  p5Start("indiv-canvas", socket);
 });
 
 socket.on("userConnect", (id) => {
@@ -74,12 +74,7 @@ socket.on("pitchEvent", (msg) => {
   playSound(msg, users[msg.id].sound);
 });
 
-let textZone = document.querySelector(".textsZone");
-socket.on("parsedSpeech", (msg) => {
-  let para = document.createElement("p");
-  para.innerHTML = msg.speech;
-  textZone.appendChild(para);
-});
+
 
 function updateUserCount(users) {
   let len = Object.keys(users).length;

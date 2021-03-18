@@ -23,7 +23,12 @@ io.on("connection", async (socket) => {
   socket.on("speechRecognition", async (blob) => {
     let parsedSpeech = await speechToText(blob);
     io.sockets.emit("parsedSpeech", { id: socket.id, speech: parsedSpeech });
-  })
+  });
+  
+  socket.on("newPicture", (msg) => {
+    socket.broadcast.emit("newPicture", msg);
+    // console.log(msg.image);
+  });
 
   socket.on('disconnect', () => {
     socket.broadcast.emit("userDisconnect", socket.id);
