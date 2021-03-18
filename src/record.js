@@ -22,6 +22,21 @@ function handleRecording(source, socket) {
   let mediaRecorder = new MediaRecorder(streamDestination.stream, { mimeType: codec});
   let chunks = [];
 
+
+  // document.addEventListener('keydown', (e) => {
+  //   if (e.code == "Space" && mediaRecorder.state == "inactive") {
+  //     console.log("starting");
+  //     mediaRecorder.start();
+  //   }
+  // });
+
+  // document.addEventListener('keyup', (e) => {
+  //   if (e.code == "Space" && mediaRecorder.state == "recording") {
+  //     console.log("stopping");
+  //     mediaRecorder.stop();
+  //   }
+  // });
+
   record.onclick = function() {
     mediaRecorder.start();
     console.log(mediaRecorder.state);

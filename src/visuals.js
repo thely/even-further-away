@@ -20,11 +20,18 @@ var counter;
 let sendRate = 0;
 let sendCounter = 0;
 let isReady = false;
-let points;
 let font;
 let allTextPoints = [];
 
 const sketch = (p) => {
+  document.querySelector(".init-camera").addEventListener("click", () => {
+    img = p.createCapture(p.VIDEO, () => {
+      isReady = true;
+    });
+    img.size(capWidth, capHeight);
+    img.hide();
+  });
+
   p.preload = () => {
     font = p.loadFont('/assets/TofinoPersonal-Regular.otf');
   }
@@ -33,11 +40,11 @@ const sketch = (p) => {
     canv = p.createCanvas(capWidth * imgScale * ct, capHeight * imgScale * ct);
     canv.parent(canvasID);
 
-    img = p.createCapture(p.VIDEO, () => {
-      isReady = true;
-    });
-    img.size(capWidth, capHeight);
-    img.hide();
+    // img = p.createCapture(p.VIDEO, () => {
+    //   isReady = true;
+    // });
+    // img.size(capWidth, capHeight);
+    // img.hide();
     
     // position = p.startInsideBounds(capWidth, capHeight);
     
@@ -46,12 +53,13 @@ const sketch = (p) => {
     // stripColor = [random(255), p.random(255), p.random(255), 255];
     p.pixelDensity(1);
     sendRate = p.random(60, 120);
-    // p.text('going to the store', 10, 30);
+
+    socket.emit("switchColors", { stroke: darkColor, fill: lightColor });
     p.stroke(darkColor);
     p.fill(lightColor);
 
-    p.textAlign(p.RIGHT);
-    addText(p, 'going to the store');
+    // p.textAlign(p.RIGHT);
+    // addText(p, 'going to the store', darkColor, lightColor);
   }
 
   p.draw = () => {
@@ -79,7 +87,6 @@ const sketch = (p) => {
         socket.emit("newPicture", data);
       }
       
-      // allFrames[frameCounter] = temp;
       for (let i = 0; i < allFrames.length; i++) {
         let x = capWidth * (i % ct);
         let y = capHeight * p.floor(i / ct);
@@ -102,11 +109,10 @@ const sketch = (p) => {
     const newImage = buildImage(p, obj.image);
     addPicture(newImage);
   });
-
-  // let textZone = document.querySelector(".textsZone");
   
   socket.on("parsedSpeech", (msg) => {
-    addText(p, msg.speech);
+    console.log(msg);
+    addText(p, msg);
   });
 }
 
@@ -114,19 +120,25 @@ let textIndex = 0;
 let maxTexts = 5;
 function addText(p, text) {
   let yval = 32 * (textIndex + 1);
-  allTextPoints[textIndex] = font.textToPoints(text, p.floor(p.random(8, 25)), yval, 32, {
+  allTextPoints[textIndex] = {};
+  allTextPoints[textIndex].points = font.textToPoints(text.speech, p.floor(p.random(8, 25)), yval, 32, {
     sampleFactor: 0.2,
     simplifyThreshold: 0
   });
+  allTextPoints[textIndex].fill = text.fill;
+  allTextPoints[textIndex].stroke = text.stroke;
   textIndex = (textIndex + 1 >= maxTexts) ? 0 : textIndex + 1;
 }
 
-function drawText(p, points) {
+function drawText(p, obj) {
+  let points = obj.points;
+  p.stroke(obj.stroke);
+  p.fill(obj.fill);
+  
   p.beginShape();
   for (let i = 0; i < points.length; i++) {
     let point = points[i];
     let x = point.x + p.random(0, 1);
-    // let x = (p.random(50) >= 47) ? point.x + p.random(-10, 20) : point.x;
     let y = (p.random(90) >= 87) ? point.y + p.random(-10, 20) : point.y;
     p.vertex(x, y);
   }
