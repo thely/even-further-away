@@ -15,6 +15,7 @@ io.on("connection", async (socket) => {
   const others = sockets.filter((a) => a !== socket.id);
   socket.emit("selfConnect", { self: socket.id, others: others });
   socket.broadcast.emit("userConnect", socket.id);
+  console.log("numsockets: " + sockets.length);
 
   socket.on("pitchEvent", (msg) => {
     socket.broadcast.emit("pitchEvent", msg);
@@ -40,9 +41,10 @@ io.on("connection", async (socket) => {
     // console.log(msg.image);
   });
 
-  socket.on('disconnect', () => {
+  socket.on('disconnect', async () => {
+    const sockets = Array.from(await io.allSockets());
     socket.broadcast.emit("userDisconnect", socket.id);
-    // console.log('user disconnected');
+    console.log("numsockets: " + sockets.length);
   });
 })
 

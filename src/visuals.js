@@ -112,7 +112,11 @@ const sketch = (p) => {
   
   socket.on("parsedSpeech", (msg) => {
     console.log(msg);
-    addText(p, msg);
+    if ("speech" in msg) {
+      addText(p, msg);
+    } else {
+      console.log("no text to put!");
+    }  
   });
 }
 

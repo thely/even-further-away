@@ -37,6 +37,7 @@ function newUser(id) {
 }
 
 socket.on("selfConnect", (ids) => {
+  users = {};
   self = newUser(ids.self);
   myID = ids.self;
   for (let id of ids.others) {
