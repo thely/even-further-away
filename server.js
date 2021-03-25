@@ -22,13 +22,17 @@ io.on("connection", async (socket) => {
   });
 
   socket.on("speechRecognition", async (blob) => {
-    let parsedSpeech = await speechToText(blob);
-    io.sockets.emit("parsedSpeech", { 
-      id: socket.id, 
-      speech: parsedSpeech, 
-      stroke: socket.strokeColor,
-      fill: socket.fillColor
-     });
+    try {
+      let parsedSpeech = await speechToText(blob);
+      io.sockets.emit("parsedSpeech", { 
+        id: socket.id, 
+        speech: parsedSpeech, 
+        stroke: socket.strokeColor,
+        fill: socket.fillColor
+      });
+    } catch(e) {
+      console.log(e);
+    }
   });
 
   socket.on("switchColors", (msg) => {
