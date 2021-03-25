@@ -1,4 +1,4 @@
-const speechToText = require("./server/speechRecognition.js");
+const { speechToText, initSpeechSocket } = require("./server/speechRecognition.js");
 const express = require('express');
 const app = express();
 const http = require('http').createServer(app);
@@ -16,6 +16,7 @@ io.on("connection", async (socket) => {
   socket.emit("selfConnect", { self: socket.id, others: others });
   socket.broadcast.emit("userConnect", socket.id);
   console.log("numsockets: " + sockets.length);
+  // initSpeechSocket();
 
   socket.on("pitchEvent", (msg) => {
     socket.broadcast.emit("pitchEvent", msg);
@@ -23,7 +24,8 @@ io.on("connection", async (socket) => {
 
   socket.on("speechRecognition", async (blob) => {
     try {
-      let parsedSpeech = await speechToText(blob);
+      let parsedSpeech = await speechToText(socket, blob);
+      console.log(parsedSpeech);
       io.sockets.emit("parsedSpeech", { 
         id: socket.id, 
         speech: parsedSpeech, 
@@ -34,6 +36,11 @@ io.on("connection", async (socket) => {
       console.log(e);
     }
   });
+
+  socket.on("speechReturn", (msg) => {
+    console.log("inside speechReturn");
+    console.log(msg);
+  })
 
   socket.on("switchColors", (msg) => {
     socket.strokeColor = msg.stroke;

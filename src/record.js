@@ -23,28 +23,34 @@ function handleRecording(source, socket) {
   let chunks = [];
 
 
-  // document.addEventListener('keydown', (e) => {
-  //   if (e.code == "Space" && mediaRecorder.state == "inactive") {
-  //     console.log("starting");
-  //     mediaRecorder.start();
-  //   }
-  // });
+  document.addEventListener('keydown', (e) => {
+    // console.log(e);
+    if (e.code == "Space" && mediaRecorder.state == "inactive") {
+      console.log("starting");
+      mediaRecorder.start();
+      console.log(mediaRecorder.state);
+    }
+  });
 
-  // document.addEventListener('keyup', (e) => {
-  //   if (e.code == "Space" && mediaRecorder.state == "recording") {
-  //     console.log("stopping");
-  //     mediaRecorder.stop();
-  //   }
-  // });
+  document.addEventListener('keyup', (e) => {
+    // console.log(e);
+    // if (e.code == "Space") {
+    //   console.log("stopping");
+    // }
+    if (e.code == "Space" && mediaRecorder.state == "recording") {
+      console.log("stopping");
+      mediaRecorder.stop();
+    }
+  });
 
-  record.onclick = function() {
-    mediaRecorder.start();
-    console.log(mediaRecorder.state);
-  }
-  endRecord.onclick = function() {
-    mediaRecorder.stop();
-    console.log(mediaRecorder.state);
-  }
+  // record.onclick = function() {
+  //   mediaRecorder.start();
+  //   console.log(mediaRecorder.state);
+  // }
+  // endRecord.onclick = function() {
+  //   mediaRecorder.stop();
+  //   console.log(mediaRecorder.state);
+  // }
 
   mediaRecorder.onstop = function(e) {
     let clipName = "mytest";
