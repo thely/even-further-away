@@ -3,6 +3,7 @@ import * as Tone from 'tone';
 import { newSynth, playSound } from "./synth.js";
 import { randomInRange, linspace } from "./utils.js";
 import { handleRecording } from "./record.js";
+import { updateMeterCount } from "./controls.js";
 
 const Pitchfinder = require("pitchfinder");
 const io = require('socket.io-client');
@@ -43,14 +44,14 @@ socket.on("selfConnect", (ids) => {
   for (let id of ids.others) {
     newUser(id);
   }
-  readjustPan(-1, 1, Tone.context.currentTime);
+  // readjustPan(-1, 1, Tone.context.currentTime);
   updateUserCount(users);
   p5Start("indiv-canvas", socket);
 });
 
 socket.on("userConnect", (id) => {
   newUser(id);
-  readjustPan(-1, 1, Tone.context.currentTime);
+  // readjustPan(-1, 1, Tone.context.currentTime);
   updateUserCount(users);
 });
 
@@ -71,16 +72,41 @@ socket.on("userDisconnect", (id) => {
 });
 
 socket.on("pitchEvent", (msg) => {
-  console.log("pitch event");
-  playSound(msg, users[msg.id].sound);
+  // console.log("pitch event");
+  playSound(msg, users[msg.id].sound, msg.id);
 });
 
 
 
 function updateUserCount(users) {
-  let len = Object.keys(users).length;
-  document.querySelector(".user-count").innerHTML = "Users on server: " + len;
+  const keys = Object.keys(users);
+  document.querySelector(".user-count").innerHTML = "Users on server: " + keys.length;
+  updateMeterCount(keys);
+  readjustPan(-1, 1, Tone.context.currentTime);
 }
+
+// let meterParent = document.getElementById("user-meters");
+// meterParent.addEventListener("meterChange", (e) => {
+//   let change = document.querySelector(`#meter-${e.detail.id} .inner`);
+//   change.style.width = e.detail.value + "%";
+// });
+
+// function updateMeterCount() {
+//   console.log("updatemetercount");
+//   let elems = "";
+//   const keys = Object.keys(users);
+//   // console.log(keys);
+//   for (let i = 0; i < keys.length; i++) {
+//     elems += `
+//       <li id="meter-${keys[i]}" class="single-meter" data-user="${keys[i]}">
+//         <span class="inner"></span>
+//         <input type="range" id="master" name="master" min="-80" max="6" step="0.5" value="0" >
+//       </li>
+//     `;
+//   }
+
+//   meterParent.innerHTML = elems;
+// }
 
 // function updateMeter()
 
@@ -138,7 +164,7 @@ function handleMic() {
 
   if (retval != "") {
     // recSet.push(retval);
-    playSound(retval, self.sound);
+    playSound(retval, self.sound, myID);
     retval.id = myID;
     socket.emit("pitchEvent", retval);
     // return retval;
@@ -170,6 +196,14 @@ document.querySelector(".initialize").addEventListener("click", () => {
     clearInterval(micInterval);
   }
 });
+
+let meterParent = document.getElementById("user-meters");
+meterParent.addEventListener("volumeChange", (e) => {
+  console.log(e);
+  users[e.detail.id].sound.channel.volume.rampTo(e.detail.multiplier);
+  // users[e.detail.id].sound.channel.volume.rampTo(e.detail.value, 0.01, Tone.context.currentTime);
+  // Tone.getDestination().volume.rampTo(e.target.value, 0.1, Tone.context.currentTime);
+})
 
 // document.querySelector("#master").addEventListener("change", (e) => {
 //   Tone.getDestination().volume.rampTo(e.target.value, 0.1, Tone.context.currentTime);

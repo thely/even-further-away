@@ -9,7 +9,7 @@ body { margin: 0; padding-bottom: 3rem; font-family: -apple-system, BlinkMacSyst
 #messages > li { padding: 0.5rem 1rem; }
 #messages > li:nth-child(odd) { background: #efefef; }
 .pot { width: 100%; }
-.pot input { width: 60%; }
+/* .pot input { width: 60%; } */
 
 .section {
   border: 1px dotted grey;
@@ -31,17 +31,44 @@ body { margin: 0; padding-bottom: 3rem; font-family: -apple-system, BlinkMacSyst
   width: 47.4%;
 }
 
+ul#user-meters {
+  list-style-type: none;
+  padding: 0;
+}
+
 .single-meter {
   background-color: white;
+  border: 1px solid rgba(0, 0, 0, 0.15);
   height: 20px;
+  position: relative;
   width: 300px;
 }
 
 .single-meter .inner {
   background-color: grey;
   display: block;
+  height: 50%;
+  width: 0%;
+}
+
+.inner, .slider {
+  position: absolute;
   height: 100%;
-  width: 1%;
+  top: 0; left: 0;
+  width: 100%;
+}
+
+.slider {
+  width: 100%;
+  z-index: 10;
+}
+
+.inner-left {
+  background-color: black;
+}
+
+.inner-right {
+  top: 50%;
 }
 
 button {

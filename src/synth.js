@@ -1,10 +1,12 @@
 import * as Tone from 'tone';
+const { updateSingleMeter } = require("./controls.js");
 
 // ~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-
 // Play pitches back
 // ~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-
 
-function playSound(msg, sound) {
+function playSound(msg, sound, id) {
+  // console.log(msg);
   let synth = sound.synth;
   if ("harmonicity" in msg) {
     synth.harmonicity.setValueAtTime(msg.harmonicity, Tone.context.currentTime);
@@ -13,6 +15,8 @@ function playSound(msg, sound) {
     synth.modulationIndex.rampTo(msg.modulationIndex.value, msg.modulationIndex.duration, Tone.context.currentTime);
   }
   if ("volume" in msg) {
+    // console.log(sound.volumeMult);
+    // let val = msg.volume * sound.volumeMult;
     synth.volume.rampTo(msg.volume, 0.01, Tone.context.currentTime);
   }
   if (msg.event == "start") {
@@ -23,23 +27,30 @@ function playSound(msg, sound) {
     synth.triggerRelease(Tone.context.currentTime);
   }
 
-  // updateMeter(sound.meter);
+  // console.log(sound.channel.volume.value);
+  console.log(sound.meter.getValue());
+  updateSingleMeter(sound.meter.getValue(), id);
+  // updateSingleMeter(sound.meter.getValue(), id);
 }
 
-// let mInner = document.querySelector(".single-meter .inner");
-// function updateMeter(meter) {
-//   // console.log(meter.getValue());
-//   let val = rangeScale(meter.getValue()*100, 0.0, 7.0, 0.0, 1.0);
-//   mInner.style.width = `${val}%`;
+// let meterParent = document.getElementById("user-meters");
+// function updateMeter(vol, id) {
+//   let val = rangeScale(vol, -30.0, 3.0, 0.0, 1.0);
+//   const event = new CustomEvent('meterChange', { 
+//     detail: {
+//       id: id,
+//       value: val * 100
+//     }
+//   });
+//   meterParent.dispatchEvent(event);
 // }
 
-function rangeScale(input, oldmin, oldmax, newmin, newmax) {
-  let percent = (input - oldmin) / (oldmax - oldmin);
-  let output = percent * (newmax - newmin) + newmin;
-  return output;
-}
+// function rangeScale(input, oldmin, oldmax, newmin, newmax) {
+//   let percent = (input - oldmin) / (oldmax - oldmin);
+//   let output = percent * (newmax - newmin) + newmin;
+//   return output;
+// }
 
-// -120 / 
 
 // ~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-
 // Synth declaration
@@ -83,12 +94,21 @@ function newSynth() {
     rolloff: -24
   });
   const bitcrush = new Tone.Distortion(0.5);
+  // const mult = new Tone.Multiply(1.0);
+  const comp = new Tone.Compressor(-20, 2);
   const channel = new Tone.Channel(-12, -0.2).toDestination();
-  const meter = new Tone.Meter({ normalRange: true });
-  synth.chain(bitcrush, filter, channel);
+  const meter = new Tone.Meter({ channels: 2 });
+  synth.chain(bitcrush, filter, comp, channel);
   channel.connect(meter);
 
-  return { synth: synth, distortion: bitcrush, filter: filter, channel: channel, meter: meter };
+  return { 
+    synth: synth, 
+    distortion: bitcrush, 
+    filter: filter, 
+    channel: channel, 
+    comp: comp, 
+    meter: meter
+  };
 }
 
 export { newSynth, playSound };
