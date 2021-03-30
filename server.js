@@ -4,6 +4,26 @@ const app = express();
 const http = require('http').createServer(app);
 const io = require('socket.io')(http);
 
+function authenticate(req, res, next) {
+  const reject = () => {
+    res.setHeader('www-authenticate', 'Basic');
+    res.sendStatus(401);
+  } 
+
+  const auth = req.headers.authorization;
+  if (!auth) {
+    return reject();
+  }
+
+  const [user, pass] = Buffer.from(auth.replace('Basic ', ''), 'base64').toString().split(':');
+  if (!((user === process.env.USER1 || user == process.env.USER2) && pass === process.env.PASSWORD)) {
+    return reject();
+  }
+  
+  return next();
+}
+
+app.use(authenticate);
 app.use(express.static('client'));
 
 app.get('/', (req, res) => {

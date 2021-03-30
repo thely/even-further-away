@@ -4,5 +4,8 @@ lib
 .DS_Store
 old
 .env
+.nuxt
+old/
+
 
 client.js.tmp-*
