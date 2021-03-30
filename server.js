@@ -23,11 +23,13 @@ function authenticate(req, res, next) {
   return next();
 }
 
+app.set("view engine", "pug");
 app.use(authenticate);
 app.use(express.static('client'));
 
 app.get('/', (req, res) => {
-  res.sendFile(__dirname + '/client/index.html');
+  // res.sendFile(__dirname + '/client/index.html');
+  res.render('index');
 });
 
 io.on("connection", async (socket) => {

@@ -1,0 +1,31 @@
+template#single-meter
+  script(type="text/javascript").
+    let mInner = document.querySelector(".single-meter .inner");
+    function updateMeter(meter) {
+      // console.log(meter.getValue());
+      let val = rangeScale(meter.getValue()*100, 0.0, 7.0, 0.0, 1.0);
+      mInner.style.width = `${val}%`;
+    }
+
+    function rangeScale(input, oldmin, oldmax, newmin, newmax) {
+      let percent = (input - oldmin) / (oldmax - oldmin);
+      let output = percent * (newmax - newmin) + newmin;
+      return output;
+    }
+
+  style.
+    .single-meter {
+      background-color: white;
+      height: 20px;
+      width: 300px;
+    }
+
+    .single-meter .inner {
+      background-color: grey;
+      display: block;
+      height: 100%;
+      width: 1%;
+    }
+
+  li.single-meter 
+    span.inner
