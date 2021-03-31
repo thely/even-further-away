@@ -71,44 +71,12 @@ socket.on("userDisconnect", (id) => {
   updateUserCount(users);
 });
 
-socket.on("pitchEvent", (msg) => {
-  // console.log("pitch event");
-  playSound(msg, users[msg.id].sound, msg.id);
-});
-
-
-
 function updateUserCount(users) {
   const keys = Object.keys(users);
   document.querySelector(".user-count").innerHTML = "Users on server: " + keys.length;
   updateMeterCount(keys);
   readjustPan(-1, 1, Tone.context.currentTime);
 }
-
-// let meterParent = document.getElementById("user-meters");
-// meterParent.addEventListener("meterChange", (e) => {
-//   let change = document.querySelector(`#meter-${e.detail.id} .inner`);
-//   change.style.width = e.detail.value + "%";
-// });
-
-// function updateMeterCount() {
-//   console.log("updatemetercount");
-//   let elems = "";
-//   const keys = Object.keys(users);
-//   // console.log(keys);
-//   for (let i = 0; i < keys.length; i++) {
-//     elems += `
-//       <li id="meter-${keys[i]}" class="single-meter" data-user="${keys[i]}">
-//         <span class="inner"></span>
-//         <input type="range" id="master" name="master" min="-80" max="6" step="0.5" value="0" >
-//       </li>
-//     `;
-//   }
-
-//   meterParent.innerHTML = elems;
-// }
-
-// function updateMeter()
 
 function readjustPan(min, max, time) {
   let index = 0;
@@ -124,6 +92,11 @@ function readjustPan(min, max, time) {
 // ~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-
 // Calculate pitch contents
 // ~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-
+
+socket.on("pitchEvent", (msg) => {
+  playSound(msg, users[msg.id].sound, msg.id);
+});
+
 let pitchHappening = false;
 let stopCounter = 0;
 let changeCounter = 0;

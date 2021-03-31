@@ -8,9 +8,11 @@ var capWidth = 40;
 var capHeight = 30;
 let midThresh = 125;
 let socket;
+let cycle = 0;
 
 let imgScale = 2;
 let allFrames = [];
+let frameSeen = [];
 let darkColor, lightColor;
 
 let ct = 10;
@@ -88,10 +90,14 @@ const sketch = (p) => {
       }
       
       for (let i = 0; i < allFrames.length; i++) {
-        let x = capWidth * (i % ct);
-        let y = capHeight * p.floor(i / ct);
+        if (frameSeen[i]){
+          continue;
+        }
+        let x = capWidth * (i % ct) + p.random(cycle * -1, cycle);
+        let y = capHeight * p.floor(i / ct) + p.random(cycle * -1, cycle);
         p.tint(255, 255, 255, 80);
         p.image(allFrames[i], x, y);
+        frameSeen[i] = true;
       }
 
       for (let i = 0; i < allTextPoints.length; i++) {
@@ -206,15 +212,21 @@ let isBlocking = false;
 function addPicture(img) {
   let i = setInterval(() => {
     if (!isBlocking) {
-      // console.log("not blocked!");
       isBlocking = true;
       allFrames[frameCounter] = img;
-      frameCounter = (frameCounter == total) ? 0 : frameCounter + 1;
+      frameSeen[frameCounter] = false;
+      if (frameCounter == total) {
+        frameCounter = 0;
+        cycle++;
+      } else {
+        frameCounter++;
+      }
+      // frameCounter = (frameCounter == total) ? 0 : frameCounter + 1;
       isBlocking = false;
       clearInterval(i);
     }
     else {
-      console.log("it's blocked!");
+      // console.log("it's blocked!");
     }
   }, 100);
 }

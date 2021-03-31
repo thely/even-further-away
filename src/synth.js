@@ -9,22 +9,22 @@ function playSound(msg, sound, id) {
   // console.log(msg);
   let synth = sound.synth;
   if ("harmonicity" in msg) {
-    synth.harmonicity.setValueAtTime(msg.harmonicity, Tone.context.currentTime);
+    // synth.harmonicity.setValueAtTime(msg.harmonicity, Tone.now());
   } 
   if ("modulationIndex" in msg) {
-    synth.modulationIndex.rampTo(msg.modulationIndex.value, msg.modulationIndex.duration, Tone.context.currentTime);
+    synth.modulationIndex.rampTo(msg.modulationIndex.value, msg.modulationIndex.duration, Tone.now());
   }
   if ("volume" in msg) {
     // console.log(sound.volumeMult);
     // let val = msg.volume * sound.volumeMult;
-    synth.volume.rampTo(msg.volume, 0.01, Tone.context.currentTime);
+    synth.volume.rampTo(msg.volume, 0.01, Tone.now());
   }
   if (msg.event == "start") {
-    synth.triggerAttack(msg.pitch, Tone.context.currentTime);
+    synth.triggerAttack(msg.pitch, Tone.now());
   } else if (msg.event == "transition") {
-    synth.frequency.rampTo(msg.pitch, 0.01, Tone.context.currentTime);
+    synth.frequency.rampTo(msg.pitch, 0.03, Tone.now());
   } else if (msg.event == "end") {
-    synth.triggerRelease(Tone.context.currentTime);
+    synth.triggerRelease(Tone.now());
   }
 
   // console.log(sound.channel.volume.value);
@@ -32,24 +32,6 @@ function playSound(msg, sound, id) {
   updateSingleMeter(sound.meter.getValue(), id);
   // updateSingleMeter(sound.meter.getValue(), id);
 }
-
-// let meterParent = document.getElementById("user-meters");
-// function updateMeter(vol, id) {
-//   let val = rangeScale(vol, -30.0, 3.0, 0.0, 1.0);
-//   const event = new CustomEvent('meterChange', { 
-//     detail: {
-//       id: id,
-//       value: val * 100
-//     }
-//   });
-//   meterParent.dispatchEvent(event);
-// }
-
-// function rangeScale(input, oldmin, oldmax, newmin, newmax) {
-//   let percent = (input - oldmin) / (oldmax - oldmin);
-//   let output = percent * (newmax - newmin) + newmin;
-//   return output;
-// }
 
 
 // ~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-
@@ -109,6 +91,10 @@ function newSynth() {
     comp: comp, 
     meter: meter
   };
+}
+
+function repeaterSynth() {
+
 }
 
 export { newSynth, playSound };

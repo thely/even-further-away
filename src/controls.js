@@ -1,6 +1,5 @@
-// import * as Tone from 'tone';
-
 let meterParent = document.getElementById("user-meters");
+let meterCache = {};
 
 function updateMeterCount(keys) {
   console.log("updatemetercount");
@@ -16,6 +15,7 @@ function updateMeterCount(keys) {
   }
 
   meterParent.innerHTML = elems;
+  meterCache = {};
   for (const meter of meterParent.children) {
     meter.addEventListener("change", (e) => {
       const event = new CustomEvent("volumeChange", {
@@ -26,17 +26,19 @@ function updateMeterCount(keys) {
       });
 
       meterParent.dispatchEvent(event);
-    })
+    });
+    meterCache[meter.dataset.user] = [meter.children[0], meter.children[1]];
   }
+
+  console.log(meterCache);
 }
 
 function updateSingleMeter(vol, id) {
   let val = [];
   val[0] = rangeScale(vol[0], -80.0, 0.0, 0.0, 1.0) * 100;
   val[1] = rangeScale(vol[1], -80.0, 0.0, 0.0, 1.0) * 100;
-  let change = document.querySelectorAll(`#meter-${id} span`);
-  change[0].style.width = val[0] + "%";
-  change[1].style.width = val[1] + "%";
+  meterCache[id][0].style.width = val[0] + "%";
+  meterCache[id][1].style.width = val[1] + "%";
 }
 
 function rangeScale(input, oldmin, oldmax, newmin, newmax) {
