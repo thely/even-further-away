@@ -87,3 +87,7 @@ button:active {
   float: right;
   font-size: 12px;
 }
+
+.play-pattern, .record-pattern, .blippy {
+  display: none;
+}

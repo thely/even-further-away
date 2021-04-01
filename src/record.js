@@ -1,8 +1,8 @@
 import * as Tone from 'tone';
 const { detect } = require('detect-browser');
 
-let record = document.querySelector(".startRecord");
-let endRecord = document.querySelector(".stopRecord");
+// let record = document.querySelector(".startRecord");
+// let endRecord = document.querySelector(".stopRecord");
 
 function setMimeType() {
   const browser = detect();
@@ -26,9 +26,9 @@ function handleRecording(source, socket) {
   document.addEventListener('keydown', (e) => {
     // console.log(e);
     if (e.code == "Space" && mediaRecorder.state == "inactive") {
-      console.log("starting");
+      // console.log("starting");
       mediaRecorder.start();
-      console.log(mediaRecorder.state);
+      // console.log(mediaRecorder.state);
     }
   });
 
@@ -38,7 +38,7 @@ function handleRecording(source, socket) {
     //   console.log("stopping");
     // }
     if (e.code == "Space" && mediaRecorder.state == "recording") {
-      console.log("stopping");
+      // console.log("stopping");
       mediaRecorder.stop();
     }
   });

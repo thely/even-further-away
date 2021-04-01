@@ -44,10 +44,19 @@ io.on("connection", async (socket) => {
     socket.broadcast.emit("pitchEvent", msg);
   });
 
+  socket.on("startTransport", () => {
+    io.sockets.emit("startTransport");
+  })
+
+  socket.on("pitchPattern", (msg) => {
+    socket.broadcast.emit("pitchPattern", msg);
+  });
+
   socket.on("speechRecognition", async (blob) => {
     try {
       let parsedSpeech = await speechToText(socket, blob);
       console.log(parsedSpeech);
+
       io.sockets.emit("parsedSpeech", { 
         id: socket.id, 
         speech: parsedSpeech, 

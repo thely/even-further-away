@@ -5,44 +5,18 @@ link(href='./client.css' rel='stylesheet')
     button.init-audio Enable audio
     button.initialize Open microphone
     button.init-camera Open camera
+    button.record-pattern Record pattern
+    button.play-pattern Play pattern
+    button.piece-start Start piece
+    button.blippy Play blippies
     span.user-count Users: 1
-  //- //  <div class="start">the start button</div> 
-  .section.section-metering
-    .pot.pot-master
-      //- //
-      //-    <input type="range" id="master" name="master" min="-80" max="6" step="0.5" value="0" >
-      //-             <label for="master">Master</label> 
-      ul#user-meters
-  //-       //  <li class="single-meter"><span class="inner"></span></li> 
-  //-   //
-  //-      <div class="button button-mute">
-  //-               <input type="checkbox" id="mute" name="mute">
-  //-               <label for="mute">Mute</label>
-  //-             </div> 
-  //- //  <div class="clipsZone"></div> 
-  //- //
-  //-    <div class="section section-watson">
-  //-           <button class="startRecord">Record</button>
-  //-           <button class="stopRecord">Stop</button>
-  //-           <div class="textsZone"></div>
-  //-         </div> 
-  #indiv-canvas
-//- //
-//-    <div class="pot pot-harmon">
-//-         fake text; one more
-//-         <input type="range" id="harmonicity" name="harmonicity" min="0" max="10" step="0.05">
-//-         <label for="volume">Harmonicity<span>: </span></label>
-//-       </div>
-//-       <div class="pot pot-mod">
-//-         <input type="range" id="modIndex" name="modulationIndex" min="0" max="1000" step="0.1">
-//-         <label for="volume">Modulation Index<span>: </span></label>
-//-       </div> 
-//- //
-//-    <ul id="messages"></ul>
-//-       <form id="form" action="">
-//-         <input id="input" autocomplete="off" /><button>Send</button>
-//-       </form> 
-//- //  <script src="/socket.io/socket.io.js"></script> 
 
-include single-meter.pug
+  .section.section-metering
+    .pot.pot-master 
+      ul#user-meters
+
+  h4.directions
+  #indiv-canvas
+
+//- include single-meter.pug
 script(src='./client.js' type='text/javascript')

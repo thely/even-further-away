@@ -26,12 +26,13 @@ let font;
 let allTextPoints = [];
 
 const sketch = (p) => {
-  document.querySelector(".init-camera").addEventListener("click", () => {
+  document.querySelector(".init-camera").addEventListener("click", (e) => {
     img = p.createCapture(p.VIDEO, () => {
       isReady = true;
     });
     img.size(capWidth, capHeight);
     img.hide();
+    e.target.style.backgroundColor = "lightgreen";
   });
 
   p.preload = () => {
@@ -41,27 +42,15 @@ const sketch = (p) => {
     counter = 0;
     canv = p.createCanvas(capWidth * imgScale * ct, capHeight * imgScale * ct);
     canv.parent(canvasID);
-
-    // img = p.createCapture(p.VIDEO, () => {
-    //   isReady = true;
-    // });
-    // img.size(capWidth, capHeight);
-    // img.hide();
-    
-    // position = p.startInsideBounds(capWidth, capHeight);
     
     darkColor = [p.random(0, 127), p.random(0, 127), p.random(0, 127), 255];
     lightColor = [p.random(80, 255), p.random(80, 255), p.random(80, 255), 255];
-    // stripColor = [random(255), p.random(255), p.random(255), 255];
     p.pixelDensity(1);
     sendRate = p.random(60, 120);
 
     socket.emit("switchColors", { stroke: darkColor, fill: lightColor });
     p.stroke(darkColor);
     p.fill(lightColor);
-
-    // p.textAlign(p.RIGHT);
-    // addText(p, 'going to the store', darkColor, lightColor);
   }
 
   p.draw = () => {
@@ -75,34 +64,14 @@ const sketch = (p) => {
       temp.updatePixels();
       addPicture(temp);
 
-      if (sendCounter >= sendRate) {
-        sendRate = p.random(80, 150);
-        sendCounter = 0;
-        const data = { 
-          id: socket.id, 
-          image: {
-            width: temp.imageData.width,
-            height: temp.imageData.height,
-            data: temp.imageData.data
-          }
-        };
-        socket.emit("newPicture", data);
-      }
-      
-      for (let i = 0; i < allFrames.length; i++) {
-        if (frameSeen[i]){
-          continue;
-        }
-        let x = capWidth * (i % ct) + p.random(cycle * -1, cycle);
-        let y = capHeight * p.floor(i / ct) + p.random(cycle * -1, cycle);
-        p.tint(255, 255, 255, 80);
-        p.image(allFrames[i], x, y);
-        frameSeen[i] = true;
-      }
+      sendFrame(p, temp);
+      drawNextFrames(p);
 
       for (let i = 0; i < allTextPoints.length; i++) {
         drawText(p, allTextPoints[i]);
       }
+
+      // drawTuner(p);
       
     }
     counter++;
@@ -110,8 +79,8 @@ const sketch = (p) => {
   }
 
   socket.on("newPicture", (obj) => {
-    console.log("we're getting a picture!");
-    console.log(obj.image);
+    // console.log("we're getting a picture!");
+    // console.log(obj.image);
     const newImage = buildImage(p, obj.image);
     addPicture(newImage);
   });
@@ -126,8 +95,68 @@ const sketch = (p) => {
   });
 }
 
+function sendFrame(p, temp) {
+  if (sendCounter >= sendRate) {
+    sendRate = p.random(80, 150);
+    sendCounter = 0;
+    const data = { 
+      id: socket.id, 
+      image: {
+        width: temp.imageData.width,
+        height: temp.imageData.height,
+        data: temp.imageData.data
+      }
+    };
+    socket.emit("newPicture", data);
+  }
+}
+
+const lowerLimit = 220;
+const upperLimit = 440;
+function rerangeNote(note) {
+  if (note >= lowerLimit && note < upperLimit) {
+    return note;
+  } else if (note < lowerLimit) {
+    return rerangeNote(note * 2);
+  } else if (note >= upperLimit) {
+    return rerangeNote(note / 2);
+  }
+}
+
+let currentNote = rerangeNote(800.0);
+let targetNote = rerangeNote(440.0);
+// console.log(currentNote, targetNote);
+function drawTuner(p) {
+  // const diff = targetNote / currentNote * 100;
+  const targetX = p.map(targetNote, upperLimit, lowerLimit, 50, p.height - 50);
+  const currentX = p.map(currentNote, upperLimit, lowerLimit, 50, p.height - 50);
+  // console.log(diff);
+  // console.log(p.width / 4 - 35); // 165
+  p.rect(p.width / 4 - 35, targetX / 2 - 2.5, 70, 5);
+  p.rect(p.width / 4 - 35, currentX / 2 - 2.5, 70, 5);
+}
+
+function updateCanvasTunerPitch(pitch) {
+  // console.log(pitch);
+  currentNote = rerangeNote(pitch);
+}
+
+function drawNextFrames(p) {
+  for (let i = 0; i < allFrames.length; i++) {
+    if (frameSeen[i]){
+      continue;
+    }
+    let x = capWidth * (i % ct) + p.random(cycle * -1, cycle);
+    let y = capHeight * p.floor(i / ct) + p.random(cycle * -1, cycle);
+    p.tint(255, 255, 255, 80);
+    p.image(allFrames[i], x, y);
+    frameSeen[i] = true;
+  }
+}
+
 let textIndex = 0;
 let maxTexts = 5;
+
 function addText(p, text) {
   let yval = 32 * (textIndex + 1);
   allTextPoints[textIndex] = {};
@@ -231,4 +260,5 @@ function addPicture(img) {
   }, 100);
 }
 
-module.exports = p5Start;
+// module.exports = p5Start;
+export { p5Start, updateCanvasTunerPitch };

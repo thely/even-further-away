@@ -5,11 +5,11 @@ const { updateSingleMeter } = require("./controls.js");
 // Play pitches back
 // ~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-
 
-function playSound(msg, sound, id) {
+function playSound(msg, sound, id, blipFunc, state) {
   // console.log(msg);
   let synth = sound.synth;
   if ("harmonicity" in msg) {
-    // synth.harmonicity.setValueAtTime(msg.harmonicity, Tone.now());
+    synth.harmonicity.setValueAtTime(msg.harmonicity, Tone.now());
   } 
   if ("modulationIndex" in msg) {
     synth.modulationIndex.rampTo(msg.modulationIndex.value, msg.modulationIndex.duration, Tone.now());
@@ -27,8 +27,11 @@ function playSound(msg, sound, id) {
     synth.triggerRelease(Tone.now());
   }
 
+  if (msg.pitch == null && state.noiseWhileSpeaking && Math.random() * 10 >= 6) {
+    blipFunc(Tone.now());
+  }
   // console.log(sound.channel.volume.value);
-  console.log(sound.meter.getValue());
+  // console.log(sound.meter.getValue());
   updateSingleMeter(sound.meter.getValue(), id);
   // updateSingleMeter(sound.meter.getValue(), id);
 }
@@ -78,9 +81,11 @@ function newSynth() {
   const bitcrush = new Tone.Distortion(0.5);
   // const mult = new Tone.Multiply(1.0);
   const comp = new Tone.Compressor(-20, 2);
+  const chorus = new Tone.Chorus(4, 2.5, 0.5);
+  const mult = new Tone.Multiply(3);
   const channel = new Tone.Channel(-12, -0.2).toDestination();
   const meter = new Tone.Meter({ channels: 2 });
-  synth.chain(bitcrush, filter, comp, channel);
+  synth.chain(bitcrush, filter, comp, chorus, mult, channel);
   channel.connect(meter);
 
   return { 
@@ -89,12 +94,24 @@ function newSynth() {
     filter: filter, 
     channel: channel, 
     comp: comp, 
+    chorus: chorus,
     meter: meter
   };
 }
 
 function repeaterSynth() {
+  const synth = new Tone.Oscillator({ type: "triangle", volume: -20 });
+  const feedbackDelay = new Tone.FeedbackDelay("8n", 0.5).toDestination();
+  const filter = new Tone.Filter(3000, "highpass");
+  const channel = new Tone.Channel(-12, -0.2).toDestination();
+  synth.chain(feedbackDelay, filter, channel);
 
+  return {
+    synth: synth,
+    delay: feedbackDelay,
+    filter: filter,
+    channel: channel
+  };
 }
 
-export { newSynth, playSound };
+export { newSynth, playSound, repeaterSynth };
