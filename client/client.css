@@ -91,3 +91,7 @@ button:active {
 .play-pattern, .record-pattern, .blippy {
   display: none;
 }
+
+.directions {
+  width: 100%;
+}
