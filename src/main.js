@@ -1,29 +1,25 @@
 require("dotenv").config();
 import * as Tone from 'tone';
-import { newSynth, playSound, repeaterSynth } from "./synth.js";
+// import { newSynth, playSound, repeaterSynth } from "./synth.js";
 import { randomInRange, linspace } from "./utils.js";
-import { handleRecording } from "./record.js";
+// import { handleRecording } from "./record.js";
 import { updateMeterCount } from "./controls.js";
-import { p5Start, updateCanvasTunerPitch } from "./visuals.js";
+// import { p5Start, updateCanvasTunerPitch } from "./visuals.js";
+import VisualHandler from "./VisualHandler.js";
+import MicInput from './MicManager.js';
+import UserSynth from './UserSynth.js';
+import PatternBuilder from './PatternBuilder.js';
 
-const Pitchfinder = require("pitchfinder");
+
+// const Pitchfinder = require("pitchfinder");
 const io = require('socket.io-client');
 var socket = io(process.env.SOCKET_URL);
-const detectPitch = new Pitchfinder.YIN();
+let micInput;
+const patternBuilder = new PatternBuilder();
+// const detectPitch = new Pitchfinder.YIN();
 // const p5Start = require("./visuals.js");
 
 let notes = ["C", "D", "E", "F", "G", "A"];
-
-const meter = new Tone.Meter();
-const mic = new Tone.UserMedia();
-const mult = new Tone.Multiply(12);
-const analysis = new Tone.Waveform(1024);
-
-mic.connect(mult);
-mult.fan(meter, analysis);
-
-let recSet = [];
-let SELF_MUTE = false;
 
 // ~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-
 // Socket listeners
@@ -33,28 +29,27 @@ let self = { };
 let myID = "";
 
 function newUser(id) {
-  users[id] = {};
-  users[id].sound = newSynth();
-  users[id].repeater = repeaterSynth();
+  users[id] = new UserSynth(id);
   users[id].repeaterEventNum = -1;
   return users[id];
 }
 
 socket.on("selfConnect", (ids) => {
   users = {};
-  self = newUser(ids.self);
   myID = ids.self;
+
+  self = newUser(myID);
   for (let id of ids.others) {
     newUser(id);
   }
-  // readjustPan(-1, 1, Tone.context.currentTime);
+
   updateUserCount(users);
-  p5Start("indiv-canvas", socket);
+  micInput = new MicInput(myID);
+  // p5Start("indiv-canvas", socket);
 });
 
 socket.on("userConnect", (id) => {
   newUser(id);
-  // readjustPan(-1, 1, Tone.context.currentTime);
   updateUserCount(users);
 });
 
@@ -64,15 +59,7 @@ socket.on("userDisconnect", (id) => {
     return;
   }
 
-  let synth = users[id].sound;
-  synth.channel.volume.value = 0;
-  users[id].repeater.channel.volume.value = 0;
-  for (let piece of Object.keys(synth)) {
-    synth[piece].dispose();
-  }
-  for (let piece of Object.keys(users[id].repeater)) {
-    users[id].repeater[piece].dispose();
-  }
+  users[id].destroy();
 
   delete users[id];
   console.log(users);
@@ -92,8 +79,9 @@ function readjustPan(min, max, time) {
   let panVals = linspace(min, max, length);
   let panVals2 = linspace(min + 0.1, max - 0.1, length);
   for (let id of Object.keys(users)) {
-    users[id].sound.channel.pan.setValueAtTime(panVals[index], time);
-    users[id].repeater.channel.pan.setValueAtTime(panVals2[index], time);
+    users[id].rePan(panVals[index]);
+    // users[id].sound.channel.pan.setValueAtTime(panVals[index], time);
+    // users[id].repeater.channel.pan.setValueAtTime(panVals2[index], time);
     index++;
   }
 }
@@ -106,60 +94,6 @@ socket.on("pitchEvent", (msg) => {
   playSound(msg, users[msg.id].sound, msg.id, playBlip, pieceState);
   // updateCanvasTunerPitch(msg.pitch);
 });
-
-let pitchHappening = false;
-let stopCounter = 0;
-let changeCounter = 0;
-
-function handleMic() {
-  if (SELF_MUTE) {
-    return;
-  }
-
-  let pitch = detectPitch(analysis.getValue());
-  let retval = "";
-  if (pitch < 10000) {
-    if (pitchHappening && pitch != null) {
-      retval = { event: "transition", pitch: pitch, time: Tone.context.currentTime + 0.01 };
-    } else {
-      pitchHappening = true;
-      let harmon = randomInRange(4, 1);
-      retval = { event: "start", pitch: pitch, time: Tone.context.currentTime, harmonicity: harmon };
-    }
-    // if (pitch == null && Math.random() * 10 >= 6) {
-    //   playBlip();
-    // }
-
-    // updateCanvasTunerPitch(pitch);
-    retval.volume = meter.getValue(); 
-
-    if (changeCounter % 5 == 0 && changeCounter != 0) {
-      let newmod = randomInRange(60, 2);
-      retval.modulationIndex = { value: newmod, duration: 0.5 };
-    }
-    changeCounter++;
-  }
-  else {
-    stopCounter++;
-    if (stopCounter > 3 && pitchHappening) {
-      stopCounter = 0;
-      changeCounter = 0;
-      pitchHappening = false;
-      retval = { event: "end", time: Tone.context.currentTime };
-    }   
-  }
-
-  if (retval != "") {
-    // recSet.push(retval);
-    playSound(retval, self.sound, myID, playBlip, pieceState);
-    retval.id = myID;
-    if (localRecord) {
-      localPattern.push(retval);
-    }
-    socket.emit("pitchEvent", retval);
-    // return retval;
-  }
-}
 
 // ~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-
 // Controls
@@ -178,6 +112,13 @@ document.querySelector(".init-audio").addEventListener("click", (e) => {
   
 }, { once: true });
 
+let visualHandler;
+document.querySelector(".init-camera").addEventListener("click", () => {
+  visualHandler = new VisualHandler("indiv-canvas");
+  visualHandler.openCamera();
+  // p5Start("indiv-canvas", socket);
+});
+
 const startButton = document.querySelector(".piece-start");
 startButton.addEventListener("click", () => {
   socket.emit("startTransport");
@@ -191,115 +132,49 @@ socket.on("startTransport", () => {
   startButton.disabled = true;
 });
 
-let localRecord = false;
-let localPattern = [];
-let localCurve = [];
+function addRecordingAsElement(blob) {
+  let audio = document.createElement('audio');
+  audio.setAttribute('controls', '');
+  document.querySelector(".clipsZone").appendChild(audio);
+  audio.controls = true;
+  audio.src = URL.createObjectURL(blob);
+}
 
 document.addEventListener('keydown', (e) => {
-  // console.log(e);
-  if (e.code == "Space" && pieceState.useRepeater && !localRecord) {
-    localRecord = true;
-    localPattern = [];
-    localCurve = [];
+  if (e.code == "Space") {
+    micInput.startRecording();
+    patternBuilder.startCollecting();
+    
   }
 });
 
-document.addEventListener('keyup', (e) => {
-  // console.log(e);
-  if (e.code == "Space" && pieceState.useRepeater && localRecord) {
-    localPattern = formatLocalPattern(localPattern);
-    console.log(localPattern);
-    localRecord = false;
+document.addEventListener('keyup', async (e) => {
+  if (e.code == "Space") {
+    const blob = await micInput.stopRecording();
+    // addRecordingAsElement(blob);
+    const pattern = patternBuilder.stopCollecting();
+    users[myID].playPattern(pattern.pitches, pattern.duration);
+    socket.emit("pitchPattern", {
+      id: myID,
+      pitches: pattern.pitches,
+      duration: pattern.duration
+    });
   }
 })
 
-document.querySelector(".record-pattern").addEventListener("click", () => {
-  if (localRecord) {
-    localPattern = formatLocalPattern(localPattern);
-    console.log(localPattern);
-  } else {
-    localPattern = [];
-    localCurve = [];
-  }
-
-  localRecord = !localRecord;
-});
-
-function formatLocalPattern(notes) {
-  const timeOff = notes[0].time;
-  let retval = [];
-  for (let note of notes) {
-    if (note.event == "transition" || note.event == "start" && note.pitch !== null) {
-      retval.push([note.time - timeOff, note.pitch]);
-      localCurve.push(note.pitch);
-    }
-  }
-
-  socket.emit("pitchPattern", {
-    id: myID,
-    duration: retval[retval.length - 1][0],
-    pitches: localCurve
-  });
-
-  eventNum = playPattern(
-    users[myID].repeater.synth, 
-    localCurve, 
-    retval[retval.length-1][0], 
-    eventNum
-  );
-
-  return retval;
+function usePitchAnalysis(val) {
+  // users[val.id].playSinger(retval, self.sound, myID, playBlip, pieceState);
+  users[val.id].playSinger(val);
+  patternBuilder.addItem(val);
+  socket.emit("pitchEvent", val);
 }
 
-let eventNum = -1;
-document.querySelector(".play-pattern").addEventListener("click", () => {
-  eventNum = playPattern(
-    users[myID].repeater.synth, 
-    localCurve, 
-    localPattern[localPattern.length-1][0], 
-    eventNum
-  );
-});
-
-function playPattern(osc, pitches, duration, eventNum) {
-  if (eventNum != -1) {
-    Tone.Transport.clear(eventNum);
-  }
-
-  eventNum = Tone.Transport.scheduleRepeat((time) => {
-    osc.start(time).stop(time + duration);
-    osc.frequency.setValueCurveAtTime(pitches, time, duration);
-    console.log(Tone.Transport.position);
-  }, "2m", Tone.Transport.position);
-
-  return eventNum;
-}
-
-socket.on("pitchPattern", (msg) => {
-  users[msg.id].repeaterEventNum = playPattern(
-      users[msg.id].repeater.synth, 
-      msg.pitches, 
-      msg.duration, 
-      users[msg.id].repeaterEventNum
-  );
-});
-
-let micInterval = null;
-document.querySelector(".initialize").addEventListener("click", (e) => {
-  if (mic.state == "stopped") {
-    Tone.context.resume();
-    mic.open().then(() => {
-      e.target.style.backgroundColor = "lightgreen";
-      handleRecording(mult, socket);
-      micInterval = setInterval(handleMic, 100);
-    }).catch(e => {
-      console.log("something failed");
-      console.log(e);
-    });
+document.querySelector(".initialize").addEventListener("click", async (e) => {
+  const retval = await micInput.changeMicState(usePitchAnalysis);
+  if (retval) {
+    e.target.style.backgroundColor = "lightgreen";
   } else {
-    mic.close();
     e.target.style.backgroundColor = "pink";
-    clearInterval(micInterval);
   }
 });
 
