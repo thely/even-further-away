@@ -16,4 +16,12 @@ function linspace(startValue, stopValue, cardinality) {
   return arr;
 }
 
-export { randomInRange, linspace };
+function addRecordingAsElement(blob) {
+  let audio = document.createElement('audio');
+  audio.setAttribute('controls', '');
+  document.querySelector(".clipsZone").appendChild(audio);
+  audio.controls = true;
+  audio.src = URL.createObjectURL(blob);
+}
+
+export { randomInRange, linspace, addRecordingAsElement };

@@ -49,7 +49,11 @@ class UserSynth {
     //   blipFunc(Tone.now());
     // }
 
-    updateSingleMeter(this.singer.meter.getValue(), this.id);
+    // updateSingleMeter(this.singer.meter.getValue(), this.id);
+  }
+
+  get singerVolume() {
+    return this.singer.meter.getValue();
   }
 
   playPattern(pitches, duration) {

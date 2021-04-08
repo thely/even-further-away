@@ -95,7 +95,7 @@ class MicInput {
   async stopRecording() {
     if (this.recorder.state == "started") {
       const rec = await this.recorder.stop();
-      return rec;
+      return { blob: rec, codec: this.codec };
     }
   }
 
