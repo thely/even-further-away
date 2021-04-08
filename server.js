@@ -47,6 +47,10 @@ io.on("connection", async (socket) => {
     io.sockets.emit("startTransport");
   })
 
+  socket.on("stopTransport", () => {
+    io.sockets.emit("stopTransport");
+  })
+
   socket.on("pitchPattern", (msg) => {
     socket.broadcast.emit("pitchPattern", msg);
   });
