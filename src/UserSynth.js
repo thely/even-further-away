@@ -7,6 +7,7 @@ class UserSynth {
     this.singer = this.buildSinger();
     this.repeater = this.buildRepeater();
     this.repeaterEvent = -1;
+    this.state = {};
   }
 
   destroy() {
@@ -56,7 +57,32 @@ class UserSynth {
     return this.singer.meter.getValue();
   }
 
+  handleStateChange(state) {
+    console.log("synth change state");
+    console.log(state);
+    this.state = state;
+
+    if (!("repeater" in state)) {
+      console.log('no repeater');
+      if (this.repeaterEvent != -1) {
+        Tone.Transport.clear(this.repeaterEvent);
+        this.repeaterEvent = -1;
+      }
+      return;
+    }
+  }
+
   playPattern(pitches, duration) {
+    console.log(this.state);
+    if (!("repeater" in this.state)) {
+      console.log('no repeater');
+      if (this.repeaterEvent != -1) {
+        Tone.Transport.clear(this.repeaterEvent);
+        this.repeaterEvent = -1;
+      }
+      return;
+    }
+    
     if (this.repeaterEvent != -1) {
       Tone.Transport.clear(this.repeaterEvent);
     }
@@ -74,6 +100,11 @@ class UserSynth {
     this.singer.channel.pan.value = val;
     this.repeater.channel.pan.value = val;
   }
+
+
+// ~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-
+// Create synths
+// ~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-
 
   buildSinger() {
     let synth = new Tone.FMSynth({

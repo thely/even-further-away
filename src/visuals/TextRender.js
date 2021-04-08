@@ -11,8 +11,9 @@ class TextRender {
   }
   
   addText(text) {
-    let yval = 32 * (this.index + 1);
-    const points = this.font.textToPoints(text.speech, p.floor(p.random(8, 25)), yval, 32, {
+    const fontSize = 64;
+    let yval = fontSize * (this.index + 1);
+    const points = this.font.textToPoints(text.speech, p.floor(p.random(8, 25)), yval, fontSize, {
       sampleFactor: 0.2,
       simplifyThreshold: 0
     });
@@ -45,6 +46,16 @@ class TextRender {
       p.vertex(x, y);
     }
     p.endShape();
+  }
+
+  drawLoudText(text) {
+    p.push();
+    p.textSize(100);
+    p.textLeading(80);
+    p.strokeWeight(15);
+    p.textAlign(p.CENTER, p.CENTER);
+    p.text(text, 0, 0, p.width, p.height);
+    p.pop();
   }
 }
 

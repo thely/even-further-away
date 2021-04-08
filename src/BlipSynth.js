@@ -27,12 +27,23 @@ class BlipSynth {
     this.synth.triggerAttackRelease(0.005, time + 0.01);
   }
 
-  // let burst = 5;
-  // let burstHappening = false;
+  handleStateChange(state) {
+    if ("blip" in state) {
+      this.blipPeriod(state.blip);
+    }
+  }
+
+  blipPeriod({ start, duration, frequency, max, prob }) {
+    Tone.Transport.scheduleRepeat((time) => {
+      this.blipBurst(Tone.now(), max, prob);
+    }, frequency, start, duration);
+  }
+
   blipBurst(time, blipMax, blipProbability) {
     this.burst.max = blipMax;
     this.burst.probability = blipProbability;
     const randval = Math.random() * 10;
+    console.log(blipProbability);
 
     if (randval >= this.burst.probability && !this.burst.happening) {
       // console.log("about to schedule burst repeat");

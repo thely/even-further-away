@@ -10,8 +10,6 @@ class UserList {
   }
 
   getSynth(id) {
-    // console.log(id);
-    // console.log(this.users);
     return this.users[id].synth;
   }
 
@@ -39,29 +37,6 @@ class UserList {
     return this.users[this.selfID];
   }
 
-  // socket.on("selfConnect", (ids) => {
-  //   users = {};
-  //   myID = ids.self;
-  
-  //   self = newUser(myID);
-  //   for (let id of ids.others) {
-  //     newUser(id);
-  //   }
-  
-  //   micInput = new MicInput(myID);
-  //   blipSynth = new BlipSynth();
-  //   pieceManager = new PieceManager();
-  //   meterBlock = new MeterBlock();
-  
-  //   updateUserCount(users);
-  // });
-  
-
-//   socket.on("userConnect", (id) => {
-//   newUser(id);
-//   updateUserCount(users);
-// });
-
   removeUser(id) {
     if (!id in this.users) {
       return;
@@ -80,22 +55,9 @@ class UserList {
     this.keys = [];
     this.selfID = "";
   }
-// socket.on("userDisconnect", (id) => {
-//   if (!id in users || !"sound" in users[id]) {
-//     return;
-//   }
-
-//   users[id].destroy();
-
-//   delete users[id];
-//   console.log(users);
-//   updateUserCount(users);
-// });
 
   updateUserCount() {
-    // const keys = Object.keys(users);
     this.statusBar.innerHTML = "Users on server: " + this.keys.length;
-    // meterBlock.updateMeterCount(keys);
     this.readjustPan(-1, 1);
   }
 
@@ -108,6 +70,14 @@ class UserList {
       this.users[id].synth.rePan(panVals[index]);
       index++;
     }
+  }
+
+  handleStateChange(state) {
+    // if ("repeater" in state) {
+      for (const key of this.keys) {
+        this.users[key].synth.handleStateChange(state);
+      }
+    // }
   }
 }
 

@@ -31,6 +31,11 @@ socket.on("selfConnect", (ids) => {
   blipSynth = new BlipSynth();
   pieceManager = new PieceManager();
   meterBlock = new MeterBlock();
+  visualHandler = new VisualHandler("indiv-canvas", socket);
+
+  pieceManager.registerListener(blipSynth);
+  pieceManager.registerListener(visualHandler);
+  pieceManager.registerListener(users);
 
   updateUserCount();
 });
@@ -48,11 +53,19 @@ socket.on("userDisconnect", (id) => {
 
 socket.on("disconnect", () => {
   users.removeAllUsers();
+  pieceManager.reset();
+  // if (visualHandler) {
+    visualHandler.deleteAll();
+  // }
 });
 
 function updateUserCount() {
   users.updateUserCount();
   meterBlock.updateMeterCount(users.keys);
+
+  if (visualHandler) {
+    visualHandler.usersChange(users.keys);
+  }
 }
 
 
@@ -78,11 +91,25 @@ startButton.addEventListener("click", () => {
   socket.emit("startTransport");
 });
 
+const stopButton = document.querySelector(".piece-stop");
+stopButton.addEventListener("click", () => {
+  socket.emit("stopTransport");
+});
+
 socket.on("startTransport", () => {
   console.log("starting transport");
   pieceManager.startPiece(blipSynth);
   startButton.style.backgroundColor = "lightgreen";
   startButton.disabled = true;
+});
+
+socket.on("stopTransport", () => {
+  pieceManager.stopPiece();
+  startButton.disabled = false;
+  // console.log("starting transport");
+  // pieceManager.startPiece(blipSynth);
+  // startButton.style.backgroundColor = "lightgreen";
+  // startButton.disabled = true;
 });
 
 
@@ -141,13 +168,18 @@ document.addEventListener('keyup', async (e) => {
   }
 });
 
+socket.on("pitchPattern", (msg) => {
+  users.getSynth(msg.id).playPattern(msg.pitches, msg.duration);
+});
+
 
 // ~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-
 // Canvas
 // ~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-
 document.querySelector(".init-camera").addEventListener("click", () => {
-  visualHandler = new VisualHandler("indiv-canvas", socket);
+  // visualHandler = new VisualHandler("indiv-canvas", socket);
   visualHandler.openCamera();
+  visualHandler.usersChange(users.keys);
 });
 
 socket.on("newPicture", (obj) => {
