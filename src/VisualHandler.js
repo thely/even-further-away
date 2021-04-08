@@ -1,6 +1,9 @@
 import p5 from 'p5';
 import FrameRender from './visuals/FrameRender';
 import TextRender from './visuals/TextRender';
+import ZoomLikeSpace from './visuals/ZoomLikeSpace';
+
+const { largestRect, largestSquare } = require("rect-scaler");
 
 // var position;
 // var canvasID;
@@ -9,9 +12,10 @@ var img;
 var capWidth = 40;
 var capHeight = 30;
 // let midThresh = 125;
-let socket;
+// let socket;
 // let cycle = 0;
 
+let font;
 let imgScale = 2;
 let darkColor, lightColor;
 
@@ -25,20 +29,20 @@ let isReady = false;
 // let font;
 // let allTextPoints = [];
 
-let s, frameRender, textRender;
+let s, frameRender, textRender, zoomSpacer;
 
 const sketch = (p) => {
   s = p;
 
   p.preload = () => {
-    textRender = new TextRender(p, 5);
+    font = s.loadFont('/assets/TofinoPersonal-Regular.otf');
     // font = p.loadFont('/assets/TofinoPersonal-Regular.otf');
   }
+
   p.setup = () => {
     counter = 0;
     p.createCanvas(capWidth * imgScale * ct, capHeight * imgScale * ct);
     // canv.parent(canvasID);
-    frameRender = new FrameRender(p, capWidth, capHeight, ct);
 
     darkColor = [p.random(0, 127), p.random(0, 127), p.random(0, 127), 255];
     lightColor = [p.random(80, 255), p.random(80, 255), p.random(80, 255), 255];
@@ -46,14 +50,24 @@ const sketch = (p) => {
     sendRate = p.random(60, 120);
 
     // socket.emit("switchColors", { stroke: darkColor, fill: lightColor });
+    parentObj.sendColors({ stroke: darkColor, fill: lightColor });
     p.stroke(darkColor);
     p.fill(lightColor);
+
+    frameRender = new FrameRender(p, capWidth, capHeight, ct);
+    textRender = new TextRender(p, { stroke: darkColor, fill: lightColor }, font, 5);
+    zoomSpacer = new ZoomLikeSpace(p, { width: capWidth, height: capHeight });
+    zoomSpacer.spaceBlocks(5);
+
+    console.log(p.width, p.height, capWidth, capHeight);
+    // const things = largestRect(p.width, p.height, 5, capWidth, capHeight);
+    // console.log(things);
   }
 
   p.draw = () => {
     if (!isReady) { return; }
     if (counter % 10 == 0) {
-      p.scale(imgScale, imgScale);
+      // p.scale(imgScale, imgScale);
       
       let temp = img.get();
       temp.loadPixels();
@@ -61,9 +75,12 @@ const sketch = (p) => {
       temp.updatePixels();
       frameRender.addFrame(temp);
 
-      // sendFrame(p, temp);
+      sendFrame(p, temp);
+      
       frameRender.drawNextFrames();
+      zoomSpacer.drawBlocks();
 
+      textRender.drawAllText();
       // for (let i = 0; i < allTextPoints.length; i++) {
       //   drawText(p, allTextPoints[i]);
       // }
@@ -74,22 +91,6 @@ const sketch = (p) => {
     counter++;
     sendCounter++;
   }
-
-  // socket.on("newPicture", (obj) => {
-  //   // console.log("we're getting a picture!");
-  //   // console.log(obj.image);
-  //   const newImage = buildImage(p, obj.image);
-  //   addPicture(newImage);
-  // });
-  
-  // socket.on("parsedSpeech", (msg) => {
-  //   console.log(msg);
-  //   if ("speech" in msg) {
-  //     addText(p, msg);
-  //   } else {
-  //     console.log("no text to put!");
-  //   }  
-  // });
 }
 
 function sendFrame(p, temp) {
@@ -97,20 +98,24 @@ function sendFrame(p, temp) {
     sendRate = p.random(80, 150);
     sendCounter = 0;
     const data = { 
-      id: socket.id, 
+      id: parentObj.socket.id, 
       image: {
         width: temp.imageData.width,
         height: temp.imageData.height,
         data: temp.imageData.data
       }
     };
-    socket.emit("newPicture", data);
+
+    parentObj.sendPicture(data);
+
   }
 }
 
-
+let parentObj;
 class VisualHandler {
-  constructor(canvasID) {
+  constructor(canvasID, socket) {
+    parentObj = this;
+    this.socket = socket;
     new p5(sketch, canvasID);
   }
 
@@ -122,19 +127,23 @@ class VisualHandler {
     img.hide();
   }
 
-  sendPicture() {
-
+  sendPicture(data) {
+    this.socket.emit("newPicture", data);
+    
   }
 
-  // remotePicture() {
-  //   const newImage = buildImage(p, obj.image);
-  //   addPicture(newImage);
-  // }
+  sendColors(colors) {
+    this.socket.emit("switchColors", colors);
+  }
+
+  frameFromServer(obj) {
+    const newImage = frameRender.buildFrame(obj.image);
+  }
   
   textFromServer(msg) {
     console.log(msg);
     if ("speech" in msg) {
-      textRender.addText(s, msg);
+      textRender.addText(msg);
     } else {
       console.log("no text to put!");
     }  

@@ -14,8 +14,6 @@ class FrameRender {
       max: ct * ct,
       cycle: 0
     }
-    // this.counter = 0;
-    // this.max = dim.ct * dim.ct;
   }
 
   drawNextFrames() {
@@ -74,6 +72,8 @@ class FrameRender {
   
     console.log("we made an image!");
     blankImage.updatePixels();
+
+    this.addFrame(blankImage);
     return blankImage;
   }
 
@@ -83,7 +83,7 @@ class FrameRender {
         this.blocking = true;
         this.frames[this.state.count] = img;
         this.seen[this.state.count] = false;
-        if (this.state.count == this.max) {
+        if (this.state.count == this.state.max) {
           this.state.count = 0;
           this.state.cycle++;
         } else {
