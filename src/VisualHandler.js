@@ -19,6 +19,7 @@ let isReady = false;
 let s, frameRender, textRender, zoomSpacer;
 
 let myState = {};
+p5.disableFriendlyErrors = true;
 
 const sketch = (p) => {
   s = p;

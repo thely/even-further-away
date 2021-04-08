@@ -5,8 +5,9 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build:js": "browserify src/main.js -o client/client.js --debug --verbose -t [ babelify --presets [@babel/preset-env] ]",
-    "watch:js": "nodemon --watch 'src' --exec 'npm run build:js'",
+    "dev:js": "browserify src/main.js -o client/client.js --debug --verbose -t [ babelify --presets [@babel/preset-env] ]",
+    "build:js": "browserify src/main.js --debug --verbose -t [ babelify --presets [@babel/preset-env] ] -t uglifyify -o client/client.js",
+    "watch:js": "nodemon --watch 'src' --exec 'npm run dev:js'",
     "watch": "npm run watch:js & nodemon server.js",
     "build": "npm run build:js",
     "serve": "node server.js"
@@ -39,6 +40,7 @@
     "browserify": "^17.0.0",
     "node-sass": "^5.0.0",
     "npm-run-all": "^4.1.5",
+    "uglifyify": "^5.0.2",
     "watchify": "^4.0.0"
   }
 }
