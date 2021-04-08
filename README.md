@@ -6,9 +6,10 @@
 * Meters let you control the volume for everyone connected to the server.
 * Press the spacebar to start recording, and release it to stop recording. Whatever you record gets sent off to IBM Watson for speech-to-text recognition.
 
-- transport
-- text stuff
-- all socket interactions
-- blippy synth
++ transport
++ text stuff
++ all socket interactions
++ blippy synth
 - form
-- updated controls
++ updated controls
+- bulletproof on Windows

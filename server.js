@@ -28,14 +28,13 @@ app.use(authenticate);
 app.use(express.static('client'));
 
 app.get('/', (req, res) => {
-  // res.sendFile(__dirname + '/client/index.html');
   res.render('index');
 });
 
 io.on("connection", async (socket) => {
   const sockets = Array.from(await io.allSockets());
-  const others = sockets.filter((a) => a !== socket.id);
-  socket.emit("selfConnect", { self: socket.id, others: others });
+  // const others = sockets.filter((a) => a !== socket.id);
+  socket.emit("selfConnect", { self: socket.id, users: sockets });
   socket.broadcast.emit("userConnect", socket.id);
   console.log("numsockets: " + sockets.length);
   // initSpeechSocket();
