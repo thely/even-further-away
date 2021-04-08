@@ -41,7 +41,7 @@ class PieceManager {
       },
       { // talk 2
         when: 124.1,
-        bigText: "WHY ARE YOU\nALWAYS SO BUSY?",     
+        bigText: "WHY ARE YOU\nALWAYS SO\nBUSY?",     
         zoomBlocks: "none",
       },
       { // start of excuses
