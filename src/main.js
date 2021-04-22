@@ -186,6 +186,12 @@ socket.on("pitchEvent", (msg) => {
   // updateCanvasTunerPitch(msg.pitch);
 });
 
+document.getElementById("user-meters").addEventListener("volumeChange", (e) => {
+  // console.log(e.detail);
+  // console.log(users.getSynth(e.detail.id));
+  users.getSynth(e.detail.id).singer.channel.volume.value = e.detail.multiplier;
+})
+
 // ~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-
 // Recording
 // ~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-
