@@ -7,13 +7,14 @@ class TextRender {
     this.font = font;
     this.texts = [];
     this.index = 0;
-    this.max = (max) ? max : 5;
+    // this.max = (max) ? max : 5;
     this.state = {
       lossyThresh: 10,
       rotation: 0,
       offset: 0,
       deviance: 0,
-      fontSize: 64
+      fontSize: 64,
+      max: (max) ? max : 5
     };
     
     // this.lossyThresh = 10;
@@ -35,7 +36,7 @@ class TextRender {
       stroke: text.stroke
     };
 
-    this.index = (this.index + 1 >= this.max) ? 0 : this.index + 1;
+    this.index = (this.index + 1 >= this.state.max) ? 0 : this.index + 1;
   }
 
   drawAllText() {
@@ -82,7 +83,10 @@ class TextRender {
   handleStateChange(state) {
     // this.state = state;
     if ("text" in state) {
-      this.state = state.text;
+      this.state = {
+        ...this.state,
+        ...state.text
+      }
     }
     // if ("textLossyThresh" in state) {
     //   this.lossyThresh = state.textLossyThresh;

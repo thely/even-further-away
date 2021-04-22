@@ -20,7 +20,7 @@ class PieceManager {
         textOffset: 40,  
         textRotation: -32.0,
         textDeviance: 2,
-        text: { offset: 40, rotation: -32, deviance: 2 },
+        text: { offset: 40, rotation: -32.0, deviance: 1 },
         // textLossyThresh: 5,
         // tinyBlocks: true,
         // repeater: { frequency: "3m" },
@@ -40,10 +40,10 @@ class PieceManager {
       { // busy sched
         when: 64.1,
         duration: 60,
-        zoom: { style: "shifty", deviance: 3 },
+        zoom: { style: "shifty", deviance: 1 },
         repeater: { frequency: "3m" },
         useBlip: true,
-        text: { offset: 40, rotation: -32, lossyThresh: 9, deviance: 2 },
+        text: { offset: 40, rotation: -32.0, lossyThresh: 9, deviance: 2 },
         // textOffset: 40,  
         // textRotation: -32.0,
         // textLossyThresh: 9,
@@ -63,8 +63,8 @@ class PieceManager {
       { // start of excuses
         when: 128.1,
         duration: 60,
-        zoom: { style: "shifty", deviance: 6 },
-        text: { offset: 60, rotation: -28.0, lossyThresh: 7, deviance: 4 },
+        zoom: { style: "shifty", deviance: 2 },
+        text: { offset: 60, rotation: -28.0, lossyThresh: 7, deviance: 4, max: 6 },
         tinyBlocks: true,
         repeater: { frequency: "3m" },
         blip: { max: 5, prob: 6, when: 65.1, duration: 60, frequency: "1n" },
@@ -84,11 +84,11 @@ class PieceManager {
       { // full excuses
         when: 192.1,
         duration: 60,
-        zoom: { style: "shifty", deviance: 10 },
+        zoom: { style: "shifty", deviance: 4 },
         tinyBlocks: true,
         repeater: { frequency: "1m" },
         // blip: { max: 5, prob: 6, when: 65.1, duration: 60, frequency: "1n" },
-        text: { offset: 60, rotation: -22.0, lossyThresh: 4, deviance: 6 },
+        text: { offset: 60, rotation: -22.0, lossyThresh: 4, deviance: 6, max: 8 },
 
         instructions: `
           Make your excuses in full. Use long sentences, but only
@@ -105,10 +105,10 @@ class PieceManager {
       { // lies and insults
         when: 256.1,
         duration: 60,
-        zoom: { style: "shifty", deviance: 30 },
+        zoom: { style: "shifty", deviance: 8 },
         tinyBlocks: true,
 
-        text: { offset: 80, rotation: -16.0, lossyThresh: 3, deviance: 8 },
+        text: { offset: 80, rotation: -16.0, lossyThresh: 3, deviance: 8, max: 10 },
 
         repeater: { frequency: "1m" },
         // blip: { max: 5, prob: 6, when: 65.1, duration: 60, frequency: "1n" },
@@ -129,12 +129,12 @@ class PieceManager {
       { // lies and insults sampler
         when: 310.1,
         duration: 60,
-        zoom: { style: "shifty", deviance: 15 },
+        zoom: { style: "shifty", deviance: 10 },
         tinyBlocks: true,
         repeater: { frequency: "3m" },
         blip: { max: 5, prob: 6, when: 65.1, duration: 60, frequency: "1n" },
 
-        text: { offset: 60, rotation: -26.0, lossyThresh: 2, deviance: 10 },
+        text: { offset: 60, rotation: -26.0, lossyThresh: 2, deviance: 10, max: 6 },
 
         instructions: `
           Take a few words from your drastic excuses and repeat them,
@@ -156,7 +156,7 @@ class PieceManager {
         tinyBlocks: true,
         repeater: { frequency: "3m" },
 
-        text: { offset: 40, rotation: -40.0, lossyThresh: 2, deviance: 2 },
+        text: { offset: 140, rotation: -40.0, lossyThresh: 2, deviance: 2, fontSize: 100, max: 5 },
 
         blip: { max: 5, prob: 6, when: 65.1, duration: 60, frequency: "1n" },
         instructions: `
