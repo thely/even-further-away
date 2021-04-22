@@ -73,7 +73,6 @@ class UserSynth {
   }
 
   playPattern(pitches, duration) {
-    console.log(this.state);
     if (!("repeater" in this.state)) {
       console.log('no repeater');
       if (this.repeaterEvent != -1) {
