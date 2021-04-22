@@ -18,6 +18,7 @@ let isReady = false;
 
 let s, frameRender, textRender, zoomSpacer;
 
+let doneCounter;
 let myState = {};
 p5.disableFriendlyErrors = true;
 
@@ -69,6 +70,7 @@ const sketch = (p) => {
 
     p.background(50);
     p.noSmooth();
+    doneCounter = 0;
   }
 
   p.draw = () => {
@@ -96,15 +98,20 @@ const sketch = (p) => {
 
       zoomSpacer.drawBlocks(myState);
       textRender.drawAllText();
-      // for (let i = 0; i < allTextPoints.length; i++) {
-      //   drawText(p, allTextPoints[i]);
-      // }
 
-      // drawTuner(p);
-      
+      if (parentObj.finished) {
+        console.log(doneCounter);
+        p.background(0, 0, 0, doneCounter * 10);
+        doneCounter++;
+  
+        if (doneCounter * 10 >= 255) {
+          p.noLoop();
+        }
+      }
     }
     counter++;
     sendCounter++;
+    
   }
   p.doubleClicked = () => {
     if (p.mouseX > 0 && p.mouseX < p.width && p.mouseY > 0 && p.mouseY < p.height) {
@@ -136,6 +143,7 @@ class VisualHandler {
   constructor(canvasID, socket, options) {
     parentObj = this;
     this.socket = socket;
+    this.finished = false;
     if (options != null && "viewer" in options) {
       this.viewer = true;
       isReady = true;
@@ -196,8 +204,15 @@ class VisualHandler {
     }
   }
 
+  fadeOut() {
+    this.finished = true;
+  }
+
   clearBoard() {
+    this.finished = false;
+    doneCounter = 0;
     s.background(50);
+    s.loop();
   }
 
   handleStateChange(state) {

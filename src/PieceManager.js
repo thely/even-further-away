@@ -88,7 +88,7 @@ class PieceManager {
         tinyBlocks: true,
         repeater: { frequency: "1m" },
         // blip: { max: 5, prob: 6, when: 65.1, duration: 60, frequency: "1n" },
-        text: { offset: 60, rotation: -22.0, lossyThresh: 4, deviance: 6, max: 8 },
+        text: { offset: 60, rotation: -22.0, lossyThresh: 4, deviance: 6, max: 7 },
 
         instructions: `
           Make your excuses in full. Use long sentences, but only
@@ -108,7 +108,7 @@ class PieceManager {
         zoom: { style: "shifty", deviance: 8 },
         tinyBlocks: true,
 
-        text: { offset: 80, rotation: -16.0, lossyThresh: 3, deviance: 8, max: 10 },
+        text: { offset: 80, rotation: -16.0, lossyThresh: 3, deviance: 8, max: 8 },
 
         repeater: { frequency: "1m" },
         // blip: { max: 5, prob: 6, when: 65.1, duration: 60, frequency: "1n" },
@@ -209,6 +209,7 @@ class PieceManager {
     Tone.Transport.cancel(0);
     Tone.Transport.stop(Tone.now());
     Tone.Transport.position = "0:0:00";
+    Tone.getDestination().volume.rampTo(-Infinity, 5);
     this.sectionIndex = 0;
     
     this.inProgress = false;
@@ -216,6 +217,7 @@ class PieceManager {
   }
 
   startPiece(blipSynth) {
+    Tone.getDestination().volume.rampTo(0, 1);
     Tone.Transport.start(Tone.now());
     this.sectionIndex = 0;
     this.inProgress = true;

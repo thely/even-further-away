@@ -151,6 +151,7 @@ socket.on("startTransport", () => {
 
 socket.on("stopTransport", () => {
   pieceManager.stopPiece();
+  visualHandler.fadeOut();
   startButton.disabled = false;
 });
 
