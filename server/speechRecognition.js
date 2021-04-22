@@ -1,7 +1,7 @@
 // import { Readable } from 'stream';
 require("dotenv").config();
 // const fs = require('fs');
-const Stream = require('stream');
+// const Stream = require('stream');
 const SpeechToTextV1 = require('ibm-watson/speech-to-text/v1');
 const { IamAuthenticator } = require('ibm-watson/auth');
 
