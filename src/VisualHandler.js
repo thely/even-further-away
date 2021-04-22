@@ -1,4 +1,5 @@
 import p5 from 'p5';
+import * as Tone from "tone";
 import FrameRender from './visuals/FrameRender';
 import TextRender from './visuals/TextRender';
 import ZoomLikeSpace from './visuals/ZoomLikeSpace';
@@ -34,6 +35,7 @@ const sketch = (p) => {
       p.resizeCanvas(p.windowWidth, p.windowHeight);
       zoomSpacer.generateBlocks(parentObj.userKeys);
       p.background(50);
+      Tone.context.resume();
     }
   }
 
