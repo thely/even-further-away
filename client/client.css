@@ -120,6 +120,7 @@ button:active {
 }
 
 .page-viewer .section-metering,
-.page-viewer .section-status {
+.page-viewer .section-status,
+.page-viewer .directions {
   display: none;
 }
