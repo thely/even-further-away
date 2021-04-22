@@ -39,11 +39,11 @@ class UserSynth {
       synth.volume.rampTo(msg.volume, 0.01, Tone.now() + 0.01);
     }
     if (msg.event == "start") {
-      synth.triggerAttack(msg.pitch, Tone.now() + 0.01);
+      synth.triggerAttack(msg.pitch);
     } else if (msg.event == "transition") {
       synth.frequency.rampTo(msg.pitch, 0.03, Tone.now() + 0.01);
     } else if (msg.event == "end") {
-      synth.triggerRelease(Tone.now() + 0.01);
+      synth.triggerRelease();
     }
 
     // if (msg.pitch == null && state.noiseWhileSpeaking && Math.random() * 10 >= 6) {
