@@ -107,7 +107,7 @@ socket.on("receivePieceState", (state) => {
 
 function updateUserCount() {
   users.updateUserCount();
-  meterBlock.updateMeterCount(users.keys);
+  meterBlock.updateMeterCount(users.keys, users.selfID);
 
   if (visualHandler) {
     visualHandler.usersChange(users.keys);

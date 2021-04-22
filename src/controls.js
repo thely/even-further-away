@@ -7,12 +7,14 @@ class MeterBlock {
     this.cache = {};
   }
 
-  updateMeterCount(keys) {
+  updateMeterCount(keys, self) {
     console.log("updatemetercount");
     let elems = "";
     for (let i = 0; i < keys.length; i++) {
+      let isSelf = "";
+      if (keys[i] == self) isSelf = "isSelf";
       elems += `
-        <li id="meter-${keys[i]}" class="single-meter" data-user="${keys[i]}">
+        <li id="meter-${keys[i]}" class="single-meter ${isSelf}" data-user="${keys[i]}">
           <span class="inner inner-left"></span>
           <span class="inner inner-right"></span>
           <input type="range" class="slider" name="channel" min="-30" max="5" step="0.1" value="0.0" >

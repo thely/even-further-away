@@ -55,6 +55,10 @@ ul#user-meters {
   width: 100%;
 }
 
+.single-meter.isSelf {
+  border-color: red;
+}
+
 .single-meter .inner {
   background-color: grey;
   display: block;
