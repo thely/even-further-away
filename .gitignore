@@ -6,6 +6,6 @@ old
 .env
 .nuxt
 old/
-
+dist/
 
 client.js.tmp-*
