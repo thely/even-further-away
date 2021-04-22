@@ -28,9 +28,25 @@ const sketch = (p) => {
     font = p.loadFont('/assets/TofinoPersonal-Regular.otf');
   }
 
+  p.windowResized = () => {
+    if (parentObj.viewer) {
+      p.resizeCanvas(p.windowWidth, p.windowHeight);
+      zoomSpacer.generateBlocks(parentObj.userKeys);
+    }
+  }
+
   p.setup = () => {
     counter = 0;
-    p.createCanvas(capWidth * imgScale * ct, capHeight * imgScale * ct);
+    let myW = p.windowWidth;
+    let myH = p.windowHeight;
+    
+    if (!parentObj.viewer) {
+      p.noLoop();
+      myW = capWidth * imgScale * ct
+      myH = capHeight * imgScale * ct;
+    }
+    
+    p.createCanvas(myW, myH);
 
     darkColor = [p.random(0, 127), p.random(0, 127), p.random(0, 127), 255];
     lightColor = [p.random(80, 255), p.random(80, 255), p.random(80, 255), 255];
@@ -46,11 +62,11 @@ const sketch = (p) => {
     zoomSpacer = new ZoomLikeSpace(p, { width: capWidth, height: capHeight });
     
     if (parentObj.userKeys) { // a bit of a hack
+      console.log("init for generate");
       zoomSpacer.generateBlocks(parentObj.userKeys);
     }
 
     p.noSmooth();
-    p.noLoop();
   }
 
   p.draw = () => {
@@ -61,21 +77,22 @@ const sketch = (p) => {
         return;
       }
 
-      let temp = img.get();
-      temp.loadPixels();
-      temp = frameRender.recolorFrame(temp, { light: lightColor, dark: darkColor });
-      temp.updatePixels();
-      frameRender.addFrame(temp);
-      zoomSpacer.addFrameToBlock(parentObj.socket.id, temp);
-
-      sendFrame(p, temp);
+      if (!parentObj.viewer) {
+        let temp = img.get();
+        temp.loadPixels();
+        temp = frameRender.recolorFrame(temp, { light: lightColor, dark: darkColor });
+        temp.updatePixels();
+        
+        frameRender.addFrame(temp);
+        zoomSpacer.addFrameToBlock(parentObj.socket.id, temp);
+        sendFrame(p, temp);
+      }  
       
       if ("tinyBlocks" in myState) {
         frameRender.drawNextFrames();
       }
 
       zoomSpacer.drawBlocks(myState);
-
       textRender.drawAllText();
       // for (let i = 0; i < allTextPoints.length; i++) {
       //   drawText(p, allTextPoints[i]);
@@ -86,6 +103,12 @@ const sketch = (p) => {
     }
     counter++;
     sendCounter++;
+  }
+  p.doubleClicked = () => {
+    if (p.mouseX > 0 && p.mouseX < p.width && p.mouseY > 0 && p.mouseY < p.height) {
+      let fs = p.fullscreen();
+      p.fullscreen(!fs);
+    }
   }
 }
 
@@ -108,10 +131,18 @@ function sendFrame(p, temp) {
 
 let parentObj;
 class VisualHandler {
-  constructor(canvasID, socket) {
+  constructor(canvasID, socket, options) {
     parentObj = this;
     this.socket = socket;
+    if (options != null && "viewer" in options) {
+      this.viewer = true;
+      isReady = true;
+    } else {
+      this.viewer = false;
+    }
+
     new p5(sketch, canvasID);
+
   }
 
   openCamera() {
@@ -135,6 +166,7 @@ class VisualHandler {
     // console.log("userschange");
     this.userKeys = userKeys;
     if (zoomSpacer) {
+      console.log("usersChange for generate");
       zoomSpacer.generateBlocks(userKeys);
     }
   };
@@ -164,6 +196,7 @@ class VisualHandler {
 
   handleStateChange(state) {
     myState = state;
+    textRender.handleStateChange(state);
   }
 }
 

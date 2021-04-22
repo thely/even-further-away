@@ -1,11 +1,11 @@
-require("dotenv").config();
+// require("dotenv").config();
 import * as Tone from 'tone';
-import { linspace } from "./utils.js";
+// import { linspace } from "./utils.js";
 // import { updateMeterCount } from "./controls.js";
 import MeterBlock from "./controls.js";
 import VisualHandler from "./VisualHandler.js";
 import MicInput from './MicManager.js';
-import UserSynth from './UserSynth.js';
+// import UserSynth from './UserSynth.js';
 import PatternBuilder from './PatternBuilder.js';
 import BlipSynth from './BlipSynth.js';
 import PieceManager from './PieceManager.js';
@@ -14,9 +14,8 @@ import UserList from './UserList.js';
 
 const io = require('socket.io-client');
 var socket = io(process.env.SOCKET_URL);
-let micInput, blipSynth, pieceManager, visualHandler, meterBlock, userList;
+let micInput, blipSynth, pieceManager, visualHandler, meterBlock, users;
 const patternBuilder = new PatternBuilder();
-let users = new UserList();
 
 let notes = ["C", "D", "E", "F", "G", "A"];
 
@@ -24,12 +23,29 @@ let notes = ["C", "D", "E", "F", "G", "A"];
 // Socket listeners
 // ~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-
 
+socket.on("viewerConnect", (ids) => {
+  users = new UserList({ "viewer": true });
+  users.resetUserList(ids);
+
+  blipSynth = new BlipSynth();
+  pieceManager = new PieceManager(socket);
+  meterBlock = new MeterBlock();
+  visualHandler = new VisualHandler("indiv-canvas", socket, { "viewer": true });
+
+  pieceManager.registerListener(blipSynth);
+  pieceManager.registerListener(visualHandler);
+  pieceManager.registerListener(users);
+
+  updateUserCount();
+});
+
 socket.on("selfConnect", (ids) => {
+  users = new UserList();
   users.resetUserList(ids);
 
   micInput = new MicInput(ids.self);
   blipSynth = new BlipSynth();
-  pieceManager = new PieceManager();
+  pieceManager = new PieceManager(socket);
   meterBlock = new MeterBlock();
   visualHandler = new VisualHandler("indiv-canvas", socket);
 
@@ -39,6 +55,10 @@ socket.on("selfConnect", (ids) => {
 
   updateUserCount();
 });
+
+// socket.on("requestCurrentTransportState", () => {
+//   socket.emit("sendCurrentTransportState")
+// });
 
 socket.on("userConnect", (id) => {
   users.newUser(id);
@@ -54,9 +74,25 @@ socket.on("userDisconnect", (id) => {
 socket.on("disconnect", () => {
   users.removeAllUsers();
   pieceManager.reset();
-  // if (visualHandler) {
-    visualHandler.deleteAll();
-  // }
+  visualHandler.deleteAll();
+});
+
+socket.on("askForPieceState", (id) => {
+  socket.emit("sendPieceState", {
+    state: {
+      transport: Tone.Transport.position,
+      ongoing: pieceManager.inProgress,
+      section: pieceManager.sectionIndex,
+    },
+    to: id
+  });
+});
+
+socket.on("receivePieceState", (state) => {
+  if (state.ongoing) {
+    pieceManager.joinOngoing(state);
+    startButton.disabled = true;
+  }
 });
 
 function updateUserCount() {
@@ -106,10 +142,6 @@ socket.on("startTransport", () => {
 socket.on("stopTransport", () => {
   pieceManager.stopPiece();
   startButton.disabled = false;
-  // console.log("starting transport");
-  // pieceManager.startPiece(blipSynth);
-  // startButton.style.backgroundColor = "lightgreen";
-  // startButton.disabled = true;
 });
 
 

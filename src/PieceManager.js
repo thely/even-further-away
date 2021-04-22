@@ -1,12 +1,15 @@
 import * as Tone from "tone";
 
 class PieceManager {
-  constructor() {
+  constructor(socket) {
     this.flags = {
       useRepeater: false,
       noiseWhileSpeaking: false,
       noiseAsBGBursts: false,
     };
+
+    this.socket = socket;
+    this.inProgress = false;
 
     this.sectionIndex = 0;
     this.state = [
@@ -14,6 +17,10 @@ class PieceManager {
         when: 0.1,
         duration: 10,
         zoom: { style: "normal" },
+        // textOffset: 20,  
+        // textRotation: -24.0,
+        // textLossyThresh: 5,
+        tinyBlocks: true,
         blip: { max: 3, prob: 7, when: 0.1, duration: 60, frequency: "1n" },
         instructions: `
           Take turns speaking, using short-form small talk. Record every time you speak.
@@ -155,13 +162,17 @@ class PieceManager {
   reset() {
     this.listeners = [];
     this.sectionIndex = 0;
+
+    // this.socket.inProgress = false;
   }
 
   pieceText(text) {
     this.dirBox.innerHTML = text;
   }
 
-  makeSection(section) {
+  makeSection(section, t) {
+    let startTime = (t == null) ? section.when : t;
+
     Tone.Transport.scheduleOnce((time) => {
       console.log(section);
       if ("instructions" in section) {
@@ -169,59 +180,48 @@ class PieceManager {
       }
       this.notifyListeners(section);
       this.sectionIndex++;
-    }, section.when);
+    }, startTime);
   }
 
   stopPiece() {
     Tone.Transport.cancel(0);
+    Tone.Transport.stop(Tone.now());
+    Tone.Transport.position = "0:0:00";
     this.sectionIndex = 0;
+    
+    this.inProgress = false;
+    // this.socket.pieceTime = Tone.Transport.position;
   }
 
   startPiece(blipSynth) {
-    Tone.Transport.start();
+    Tone.Transport.start(Tone.now());
     this.sectionIndex = 0;
+    this.inProgress = true;
 
     for (const section of this.state) {
       this.makeSection(section);
     }
+  }
 
-    // this.makeSection((time) => {
-    //   blipSynth.blipBurst(time, 3, 7);
-    // }, "1n", 0.1, 60);
+  joinOngoing(state) {
+    if (state.ongoing) {
+      console.log(state);
+      this.inProgress = true;
+      this.sectionIndex = state.section - 1;
+      Tone.Transport.position = state.position;
 
-    // this.makeSection((time) => {
-    //   blipSynth.blipBurst(time, 5, 6);
-    // }, "2n", )
-    
-  //     this.pieceText("Speak only one word at a time, and record any time you speak.");
-  //   }, "1n", 0.1, 60);
+      for (let i = 0; i < this.state.length; i++) {
+        if (i > this.sectionIndex) {
+          this.makeSection(this.state[i]);
+        } else if (i == this.sectionIndex) {
+          this.makeSection(this.state[i], Tone.now());
+        }
+      }
 
-    // this.makeSection((time) => {
-    //   blipSynth.blipBurst(time, 5, 6);
-    // }, "1n", 60.1, 60);
-  // burstHappening = false;
-
-  //   Tone.Transport.scheduleRepeat((time) => {
-  //     // console.log("first section");
-  //     // pieceState.useRepeater = true;
-  //     blipSynth.blipBurst(time, 3, 7);
-  //     this.pieceText("Speak only one word at a time, and record any time you speak.");
-  //   }, "1n", 0.1, 60);
-
-  //   Tone.Transport.scheduleRepeat((time) => {
-  //     console.log("in section two");
-  //     this.flags.useRepeater = true;
-  //     blipSynth.blipBurst(time, 5, 6);
-  //     this.pieceText("Speak three words at a time. When you record, you should hear yourself back in a different synth.");
-  //   }, "2n", 60.1, 60);
-
-  //   Tone.Transport.scheduleRepeat((time) => {
-  //     console.log("section 3");
-  //     blipSynth.blipBurst(time, 6, 5);
-  //     this.flags.noiseWhileSpeaking = true;
-  //     this.pieceText("Talk frequently in a normal voice. Record yourself intermittently, for ~3 words at a time.");
-  //   }, "2n", 120.1, 60);
-  // }
+      Tone.Transport.start(0.1, state.position);
+    } else {
+      console.log("piece not started yet");
+    }
   }
 }
 

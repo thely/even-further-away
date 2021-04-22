@@ -5,8 +5,9 @@ class FrameRender {
     p = s;
     this.frames = [];
     this.seen = [];
-    this.dim = { w: w, h: h, ct: ct };
-    this.thresh = 125;
+    this.dim = { w: w, h: h, ct: ct, cols: p.width / w, rows: p.height / h };
+    this.pos = { x: 0, y: 0 };
+    this.thresh = 125; // color threshold
     this.blocking = false;
 
     this.state = {
@@ -21,6 +22,26 @@ class FrameRender {
       if (this.seen[i]){
         continue;
       }
+
+      let x = this.pos.x * this.dim.w;
+      let y = this.pos.y * this.dim.h;
+      // let x = this.dim.w * (i % this.dim.ct) + p.random(this.state.cycle * -1, this.state.cycle);
+      // let y = this.dim.h * p.floor(i / this.dim.ct) + p.random(this.state.cycle * -1, this.state.cycle);
+      p.tint(255, 255, 255, 80);
+      p.image(this.frames[i], x, y);
+      this.seen[i] = true;
+      this.pos.y = (this.pos.x >= this.dim.cols) ? this.pos.y + 1 : this.pos.y;
+      this.pos.y = (this.pos.y >= this.dim.rows) ? 0 : this.pos.y;
+      this.pos.x = (this.pos.x >= this.dim.cols) ? 0 : this.pos.x + 1;
+      
+    }
+  }
+
+  drawNextFramesFixed() {
+    for (let i = 0; i < this.frames.length; i++) {
+      if (this.seen[i]){
+        continue;
+      }
       let x = this.dim.w * (i % this.dim.ct) + p.random(this.state.cycle * -1, this.state.cycle);
       let y = this.dim.h * p.floor(i / this.dim.ct) + p.random(this.state.cycle * -1, this.state.cycle);
       p.tint(255, 255, 255, 80);
@@ -29,6 +50,7 @@ class FrameRender {
     }
   }
 
+  // from the performer side, recolor image
   recolorFrame(img, colors) {
     const d = p.pixelDensity();
   
@@ -53,6 +75,7 @@ class FrameRender {
     return img;
   }
 
+  // taking Uint8Clamped sent in from the server, turn it into a p5 image
   buildFrame(imgData) {
     const data = new Uint8ClampedArray(imgData.data);
     let d = p.pixelDensity();
@@ -77,6 +100,8 @@ class FrameRender {
     return blankImage;
   }
 
+  // add a new frame to the stack
+  // called both by the performer and the server, so blocking is involved
   addFrame(img) {
     let i = setInterval(() => {
       if (!this.blocking) {

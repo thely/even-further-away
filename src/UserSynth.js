@@ -30,20 +30,20 @@ class UserSynth {
     // console.log(msg);
     let synth = this.singer.synth;
     if ("harmonicity" in msg) {
-      synth.harmonicity.setValueAtTime(msg.harmonicity, Tone.now());
+      synth.harmonicity.setValueAtTime(msg.harmonicity, Tone.now() + 0.01);
     } 
     if ("modulationIndex" in msg) {
-      synth.modulationIndex.rampTo(msg.modulationIndex.value, msg.modulationIndex.duration, Tone.now());
+      synth.modulationIndex.rampTo(msg.modulationIndex.value, msg.modulationIndex.duration, Tone.now() + 0.01);
     }
     if ("volume" in msg) {
-      synth.volume.rampTo(msg.volume, 0.01, Tone.now());
+      synth.volume.rampTo(msg.volume, 0.01, Tone.now() + 0.01);
     }
     if (msg.event == "start") {
-      synth.triggerAttack(msg.pitch, Tone.now());
+      synth.triggerAttack(msg.pitch, Tone.now() + 0.01);
     } else if (msg.event == "transition") {
-      synth.frequency.rampTo(msg.pitch, 0.03, Tone.now());
+      synth.frequency.rampTo(msg.pitch, 0.03, Tone.now() + 0.01);
     } else if (msg.event == "end") {
-      synth.triggerRelease(Tone.now());
+      synth.triggerRelease(Tone.now() + 0.01);
     }
 
     // if (msg.pitch == null && state.noiseWhileSpeaking && Math.random() * 10 >= 6) {

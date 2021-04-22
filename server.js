@@ -31,16 +31,38 @@ app.get('/', (req, res) => {
   res.render('index');
 });
 
+app.get('/viewer', (req, res) => {
+  res.render('viewer');
+});
+
 io.on("connection", async (socket) => {
-  const sockets = Array.from(await io.allSockets());
-  // const others = sockets.filter((a) => a !== socket.id);
-  socket.emit("selfConnect", { self: socket.id, users: sockets });
-  socket.broadcast.emit("userConnect", socket.id);
-  console.log("numsockets: " + sockets.length);
+  const room = socket.handshake.headers.referer.includes("viewer") ? "viewers" : "performers";
+  socket.join(room);
+
+  const performers = Array.from(await io.in("performers").allSockets());
+
+  if (room == "performers") {
+    socket.emit("selfConnect", { self: socket.id, users: performers });
+    socket.broadcast.emit("userConnect", socket.id);
+  } else {
+    socket.emit("viewerConnect", { users: performers });
+  }
+
+  if (performers.length > 1) {
+    socket.needsPieceState = true;
+    console.log(performers);
+    io.to(performers[0]).emit("askForPieceState", socket.id);
+  }
+  
+  console.log("numsockets: " + performers.length);
   // initSpeechSocket();
 
-  socket.on("pitchEvent", (msg) => {
-    socket.broadcast.emit("pitchEvent", msg);
+  // ~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-
+  // Piece state/Transport
+  // ~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-
+
+  socket.on("sendPieceState", (obj) => {
+    io.to(obj.to).emit("receivePieceState", obj.state);
   });
 
   socket.on("startTransport", () => {
@@ -49,7 +71,15 @@ io.on("connection", async (socket) => {
 
   socket.on("stopTransport", () => {
     io.sockets.emit("stopTransport");
-  })
+  });
+
+  // ~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-
+  // Pitch + Speech
+  // ~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-
+
+  socket.on("pitchEvent", (msg) => {
+    socket.broadcast.emit("pitchEvent", msg);
+  });
 
   socket.on("pitchPattern", (msg) => {
     socket.broadcast.emit("pitchPattern", msg);
@@ -74,7 +104,11 @@ io.on("connection", async (socket) => {
   socket.on("speechReturn", (msg) => {
     console.log("inside speechReturn");
     console.log(msg);
-  })
+  });
+
+  // ~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-
+  // Images
+  // ~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-
 
   socket.on("switchColors", (msg) => {
     socket.strokeColor = msg.stroke;
@@ -86,10 +120,16 @@ io.on("connection", async (socket) => {
     // console.log(msg.image);
   });
 
+  // ~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-
+  // Connection
+  // ~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-
+
   socket.on('disconnect', async () => {
-    const sockets = Array.from(await io.allSockets());
-    socket.broadcast.emit("userDisconnect", socket.id);
-    console.log("numsockets: " + sockets.length);
+    // const sockets = Array.from(await io.allSockets());
+    if (room == "performers") {
+      socket.broadcast.emit("userDisconnect", socket.id);
+    }
+    // console.log("numsockets: " + sockets.length);
   });
 })
 

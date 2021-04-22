@@ -8,6 +8,11 @@ class TextRender {
     this.texts = [];
     this.index = 0;
     this.max = (max) ? max : 5;
+    this.state = {};
+    
+    this.lossyThresh = 10;
+    this.rotation = 0;
+    this.offset = 0;
   }
   
   addText(text) {
@@ -38,14 +43,24 @@ class TextRender {
     p.stroke(obj.stroke);
     p.fill(obj.fill);
     
+    p.push();
+    if (this.rotation) {
+      p.rotate(p.PI / this.rotation);
+    }
+    if (this.offset) {
+      p.translate(0, this.offset);
+    }
+    
     p.beginShape();
     for (let i = 0; i < points.length; i++) {
+      if (p.random(0, 10) >= this.lossyThresh) continue;
       let point = points[i];
       let x = point.x + p.random(0, 1);
       let y = (p.random(90) >= 87) ? point.y + p.random(-10, 20) : point.y;
       p.vertex(x, y);
     }
     p.endShape();
+    p.pop();
   }
 
   drawLoudText(text) {
@@ -56,6 +71,19 @@ class TextRender {
     p.textAlign(p.CENTER, p.CENTER);
     p.text(text, 0, 0, p.width, p.height);
     p.pop();
+  }
+
+  handleStateChange(state) {
+    // this.state = state;
+    if ("textLossyThresh" in state) {
+      this.lossyThresh = state.textLossyThresh;
+    }
+    if ("textRotation" in state) {
+      this.rotation = state.textRotation;
+    }
+    if ("textOffset" in state) {
+      this.offset = state.textOffset;
+    }
   }
 }
 

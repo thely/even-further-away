@@ -1,0 +1,22 @@
+title EGREGORE
+link(href='./client.css' rel='stylesheet')
+.page-wrap.page-viewer
+  .section.section-status
+    button.init-audio Enable audio
+    button.initialize Open microphone
+    button.init-camera Open camera
+    button.piece-start Start piece
+    button.piece-stop Stop piece
+    span.user-count Users: 1
+
+  //- .section.clipsZone
+
+  .section.section-metering
+    .pot.pot-master 
+      ul#user-meters
+
+  //- h4.directions
+  #indiv-canvas
+
+//- include single-meter.pug
+script(src='./client.js' type='text/javascript')

@@ -2,11 +2,15 @@ import UserSynth from './UserSynth.js';
 import { linspace } from "./utils.js";
 
 class UserList {
-  constructor() {
+  constructor(options) {
     this.users = {};
     this.selfID = "";
     this.keys = [];
     this.statusBar = document.querySelector(".user-count");
+
+    if (options != null && "viewer" in options && options.viewer) {
+      this.viewer = true;
+    }
   }
 
   getSynth(id) {
@@ -26,7 +30,10 @@ class UserList {
 
   resetUserList(ids) {
     this.users = {};
-    this.selfID = ids.self;
+
+    if ("self" in ids) {
+      this.selfID = ids.self;
+    }
 
     for (let id of ids.users) {
       this.newUser(id);
@@ -57,7 +64,10 @@ class UserList {
   }
 
   updateUserCount() {
-    this.statusBar.innerHTML = "Users on server: " + this.keys.length;
+    if (!this.viewer) {
+      this.statusBar.innerHTML = "Users on server: " + this.keys.length;
+    }
+    
     this.readjustPan(-1, 1);
   }
 

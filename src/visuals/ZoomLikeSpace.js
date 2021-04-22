@@ -67,6 +67,8 @@ class ZoomLikeSpace {
 
   generateBlocks(users) {
     const count = users.length;
+    if (count == 0) return;
+    
     this.blocks = [];
     this.keys = users;
 
