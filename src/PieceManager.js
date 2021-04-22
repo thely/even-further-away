@@ -157,7 +157,7 @@ class PieceManager {
         tinyBlocks: true,
         repeater: { frequency: "3m" },
 
-        text: { offset: 140, rotation: -40.0, lossyThresh: 2, deviance: 2, fontSize: 100, max: 5 },
+        text: { offset: 80, rotation: -40.0, lossyThresh: 2, deviance: 2, fontSize: 100, max: 5 },
 
         blip: { max: 5, prob: 6, when: 65.1, duration: 60, frequency: "1n" },
         instructions: `

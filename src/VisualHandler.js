@@ -125,7 +125,7 @@ const sketch = (p) => {
 
 function sendFrame(p, temp) {
   if (sendCounter >= sendRate) {
-    sendRate = p.random(80, 150);
+    sendRate = p.random(40, 100);
     sendCounter = 0;
     const data = { 
       id: parentObj.socket.id, 
