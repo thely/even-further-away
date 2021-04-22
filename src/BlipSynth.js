@@ -65,6 +65,14 @@ class BlipSynth {
       }, "16n", Tone.Transport.position, 10);
     }
   }
+  destroy() {
+    this.synth.volume.value = 0;
+
+    this.synth.dispose();
+    this.filter.dispose();
+    this.bitcrush.dispose();
+    this.autoPanner.dispose();
+  }
 }
 
 export default BlipSynth;

@@ -32,6 +32,7 @@ const sketch = (p) => {
     if (parentObj.viewer) {
       p.resizeCanvas(p.windowWidth, p.windowHeight);
       zoomSpacer.generateBlocks(parentObj.userKeys);
+      p.background(50);
     }
   }
 
@@ -66,6 +67,7 @@ const sketch = (p) => {
       zoomSpacer.generateBlocks(parentObj.userKeys);
     }
 
+    p.background(50);
     p.noSmooth();
   }
 
@@ -192,6 +194,10 @@ class VisualHandler {
     if (zoomSpacer) {
       zoomSpacer.deleteAll();
     }
+  }
+
+  clearBoard() {
+    s.background(50);
   }
 
   handleStateChange(state) {

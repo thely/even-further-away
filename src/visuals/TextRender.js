@@ -8,17 +8,23 @@ class TextRender {
     this.texts = [];
     this.index = 0;
     this.max = (max) ? max : 5;
-    this.state = {};
+    this.state = {
+      lossyThresh: 10,
+      rotation: 0,
+      offset: 0,
+      deviance: 0,
+      fontSize: 64
+    };
     
-    this.lossyThresh = 10;
-    this.rotation = 0;
-    this.offset = 0;
+    // this.lossyThresh = 10;
+    // this.rotation = 0;
+    // this.offset = 0;
   }
   
   addText(text) {
-    const fontSize = 64;
-    let yval = fontSize * (this.index + 1);
-    const points = this.font.textToPoints(text.speech, p.floor(p.random(8, 25)), yval, fontSize, {
+    // const fontSize = 64;
+    let yval = this.state.fontSize * (this.index + 1);
+    const points = this.font.textToPoints(text.speech, p.floor(p.random(8, 25)), yval, this.state.fontSize, {
       sampleFactor: 0.2,
       simplifyThreshold: 0
     });
@@ -44,16 +50,16 @@ class TextRender {
     p.fill(obj.fill);
     
     p.push();
-    if (this.rotation) {
-      p.rotate(p.PI / this.rotation);
+    if (this.state.rotation) {
+      p.rotate(p.PI / p.random(this.state.rotation - this.state.deviance, this.state.rotation + this.state.deviance));
     }
-    if (this.offset) {
-      p.translate(0, this.offset);
+    if (this.state.offset) {
+      p.translate(0, p.random(this.state.offset - this.state.deviance, this.state.offset + this.state.deviance));
     }
     
     p.beginShape();
     for (let i = 0; i < points.length; i++) {
-      if (p.random(0, 10) >= this.lossyThresh) continue;
+      if (p.random(0, 10) >= this.state.lossyThresh) continue;
       let point = points[i];
       let x = point.x + p.random(0, 1);
       let y = (p.random(90) >= 87) ? point.y + p.random(-10, 20) : point.y;
@@ -75,15 +81,18 @@ class TextRender {
 
   handleStateChange(state) {
     // this.state = state;
-    if ("textLossyThresh" in state) {
-      this.lossyThresh = state.textLossyThresh;
+    if ("text" in state) {
+      this.state = state.text;
     }
-    if ("textRotation" in state) {
-      this.rotation = state.textRotation;
-    }
-    if ("textOffset" in state) {
-      this.offset = state.textOffset;
-    }
+    // if ("textLossyThresh" in state) {
+    //   this.lossyThresh = state.textLossyThresh;
+    // }
+    // if ("textRotation" in state) {
+    //   this.rotation = state.textRotation;
+    // }
+    // if ("textOffset" in state) {
+    //   this.offset = state.textOffset;
+    // }
   }
 }
 

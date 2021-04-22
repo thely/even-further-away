@@ -10,11 +10,12 @@ import PatternBuilder from './PatternBuilder.js';
 import BlipSynth from './BlipSynth.js';
 import PieceManager from './PieceManager.js';
 import UserList from './UserList.js';
+import BwommSynth from './BwommSynth.js';
 
 
 const io = require('socket.io-client');
 var socket = io(process.env.SOCKET_URL);
-let micInput, blipSynth, pieceManager, visualHandler, meterBlock, users;
+let micInput, blipSynth, bwommSynth, pieceManager, visualHandler, meterBlock, users;
 const patternBuilder = new PatternBuilder();
 
 let notes = ["C", "D", "E", "F", "G", "A"];
@@ -24,15 +25,18 @@ let notes = ["C", "D", "E", "F", "G", "A"];
 // ~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-
 
 socket.on("viewerConnect", (ids) => {
+  clearOldCanvas();
   users = new UserList({ "viewer": true });
   users.resetUserList(ids);
 
   blipSynth = new BlipSynth();
+  bwommSynth = new BwommSynth();
   pieceManager = new PieceManager(socket);
   meterBlock = new MeterBlock();
   visualHandler = new VisualHandler("indiv-canvas", socket, { "viewer": true });
 
   pieceManager.registerListener(blipSynth);
+  pieceManager.registerListener(bwommSynth);
   pieceManager.registerListener(visualHandler);
   pieceManager.registerListener(users);
 
@@ -40,25 +44,28 @@ socket.on("viewerConnect", (ids) => {
 });
 
 socket.on("selfConnect", (ids) => {
+  clearOldCanvas();
   users = new UserList();
   users.resetUserList(ids);
 
   micInput = new MicInput(ids.self);
   blipSynth = new BlipSynth();
+  bwommSynth = new BwommSynth();
   pieceManager = new PieceManager(socket);
   meterBlock = new MeterBlock();
   visualHandler = new VisualHandler("indiv-canvas", socket);
 
   pieceManager.registerListener(blipSynth);
+  pieceManager.registerListener(bwommSynth);
   pieceManager.registerListener(visualHandler);
   pieceManager.registerListener(users);
 
   updateUserCount();
 });
 
-// socket.on("requestCurrentTransportState", () => {
-//   socket.emit("sendCurrentTransportState")
-// });
+function clearOldCanvas() {
+  document.querySelector("#indiv-canvas").innerHTML = "";
+}
 
 socket.on("userConnect", (id) => {
   users.newUser(id);
@@ -75,6 +82,8 @@ socket.on("disconnect", () => {
   users.removeAllUsers();
   pieceManager.reset();
   visualHandler.deleteAll();
+  blipSynth.destroy();
+  bwommSynth.destroy();
 });
 
 socket.on("askForPieceState", (id) => {
@@ -135,6 +144,7 @@ stopButton.addEventListener("click", () => {
 socket.on("startTransport", () => {
   console.log("starting transport");
   pieceManager.startPiece(blipSynth);
+  visualHandler.clearBoard();
   startButton.style.backgroundColor = "lightgreen";
   startButton.disabled = true;
 });
