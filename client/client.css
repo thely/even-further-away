@@ -19,16 +19,26 @@ body { margin: 0; padding-bottom: 3rem; font-family: -apple-system, BlinkMacSyst
 
 .page-wrap {
   display: flex;
-  flex-wrap: wrap;
+  justify-content: center;
+  /* flex-wrap: wrap; */
+}
+
+.sidebar {
+  order: 1;
+  margin-left: 1em;
+  margin-top: 1em;
+  max-width: 200px;
 }
 
 .section-status {
   flex: 0 1 auto;
-  width: 100%;
+  max-width: 100%;
 }
 .section-metering, .section-watson {
+  border-top: 0;
+  padding: 1em;
   flex: 0 1 auto;
-  width: 47.4%;
+  max-width: 100%;
 }
 
 ul#user-meters {
@@ -41,7 +51,8 @@ ul#user-meters {
   border: 1px solid rgba(0, 0, 0, 0.15);
   height: 20px;
   position: relative;
-  width: 300px;
+  /* width: 300px; */
+  width: 100%;
 }
 
 .single-meter .inner {
@@ -75,7 +86,10 @@ button {
   background-color: #d7d7d7;
   border: 0px solid transparent;
   border-radius: 5px;
+  display: block;
   /* font: 16px "Helvetica"; */
+  margin: 0 auto;
+  margin-bottom: 1em;
   padding: 1em;
 }
 
@@ -84,8 +98,11 @@ button:active {
 }
 
 .user-count {
-  float: right;
+  /* float: right; */
+  display: block;
   font-size: 12px;
+  margin-top: 2em;
+  text-align: center;
 }
 
 .play-pattern, .record-pattern, .blippy {
@@ -93,5 +110,12 @@ button:active {
 }
 
 .directions {
+  max-width: 800px;
+  min-height: 25px;
   width: 100%;
+}
+
+.page-viewer .section-metering,
+.page-viewer .section-status {
+  display: none;
 }
