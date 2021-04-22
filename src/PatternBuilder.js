@@ -28,16 +28,20 @@ class PatternBuilder {
   }
 
   formatLocalPattern() {
-    const timeOff = this.pattern[0].time;
-    let retval = [];
-    for (let note of this.pattern) {
-      if (note.event == "transition" || note.event == "start" && note.pitch !== null) {
-        retval.push([note.time - timeOff, note.pitch]);
-        this.curve.push(note.pitch);
+    if (this.pattern.length > 0) {
+      const timeOff = this.pattern[0].time;
+      let retval = [];
+      for (let note of this.pattern) {
+        if (note.event == "transition" || note.event == "start" && note.pitch !== null) {
+          retval.push([note.time - timeOff, note.pitch]);
+          this.curve.push(note.pitch);
+        }
       }
-    }
 
-    return { pitches: this.curve, duration: retval[retval.length-1][0] };
+      return { pitches: this.curve, duration: retval[retval.length-1][0] };
+    } else {
+      return { error: "no pitch sequence" };
+    }
   }
 }
 

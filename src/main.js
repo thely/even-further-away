@@ -202,17 +202,21 @@ document.addEventListener('keyup', async (e) => {
     socket.emit("speechRecognition", blob);
 
     const pattern = patternBuilder.stopCollecting();
-    users.self.synth.playPattern(pattern.pitches, pattern.duration);
-    socket.emit("pitchPattern", {
-      id: users.selfID,
-      pitches: pattern.pitches,
-      duration: pattern.duration
-    });
+    if (!("error" in pattern)) {
+      users.self.synth.playPattern(pattern.pitches, pattern.duration);
+      socket.emit("pitchPattern", {
+        id: users.selfID,
+        pitches: pattern.pitches,
+        duration: pattern.duration
+      });
+    }
   }
 });
 
 socket.on("pitchPattern", (msg) => {
-  users.getSynth(msg.id).playPattern(msg.pitches, msg.duration);
+  if ("pitches" in msg) {
+    users.getSynth(msg.id).playPattern(msg.pitches, msg.duration);
+  }
 });
 
 

@@ -24,6 +24,7 @@ class PieceManager {
         // textLossyThresh: 5,
         // tinyBlocks: true,
         // repeater: { frequency: "3m" },
+        repeater: { frequency: "3m" },
         blip: { max: 3, prob: 7, when: 0.1, duration: 60, frequency: "1n" },
         // bwomm: true,
         instructions: `
@@ -32,13 +33,13 @@ class PieceManager {
         `
       },
       { //speak1
-        when: 60.1,
+        when: 70.1,
         bigText: "SO WHEN CAN\nI MEET YOU?",     
         zoomBlocks: "none",
         bwomm: true,
       },
       { // busy sched
-        when: 64.1,
+        when: 74.1,
         duration: 60,
         zoom: { style: "shifty", deviance: 1 },
         repeater: { frequency: "3m" },
@@ -55,13 +56,13 @@ class PieceManager {
         `
       },
       { // talk 2
-        when: 124.1,
+        when: 144.1,
         bigText: "WHY DO YOU\nALWAYS SAY\nYOU'RE BUSY?",     
         zoomBlocks: "none",
         bwomm: true,
       },
       { // start of excuses
-        when: 128.1,
+        when: 148.1,
         duration: 60,
         zoom: { style: "shifty", deviance: 2 },
         text: { offset: 60, rotation: -28.0, lossyThresh: 7, deviance: 4, max: 6 },
@@ -76,13 +77,13 @@ class PieceManager {
         `
       },
       { // talk 3
-        when: 188.1,
+        when: 208.1,
         bigText: "THAT'S NOT\nWHAT I MEANT",     
         zoomBlocks: "none",
         bwomm: true,
       },
       { // full excuses
-        when: 192.1,
+        when: 212.1,
         duration: 60,
         zoom: { style: "shifty", deviance: 4 },
         tinyBlocks: true,
@@ -97,13 +98,13 @@ class PieceManager {
         `
       },
       { // talk 4
-        when: 252.1,
+        when: 282.1,
         bigText: "WHY DO\nYOU KEEP\nAPOLOGIZING",     
         zoomBlocks: "none",
         bwomm: true,
       },
       { // lies and insults
-        when: 256.1,
+        when: 286.1,
         duration: 60,
         zoom: { style: "shifty", deviance: 8 },
         tinyBlocks: true,
@@ -121,13 +122,13 @@ class PieceManager {
         `
       },
       { // talk 4
-        when: 306.1,
+        when: 356.1,
         bigText: "DO YOU NOT\nLIKE ME OR\nSOMETHING",     
         zoomBlocks: "none",
         bwomm: true,
       },
       { // lies and insults sampler
-        when: 310.1,
+        when: 360.1,
         duration: 60,
         zoom: { style: "shifty", deviance: 10 },
         tinyBlocks: true,
@@ -144,13 +145,13 @@ class PieceManager {
         `
       },
       { // talk 4
-        when: 306.1,
+        when: 364.1,
         bigText: "I DON'T NEED\nTO DEAL\nWITH THIS",     
         zoomBlocks: "none",
         bwomm: true,
       },
       { // small talk redux
-        when: 310.1,
+        when: 368.1,
         duration: 60,
         zoom: { style: "normal" },
         tinyBlocks: true,
