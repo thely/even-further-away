@@ -82,6 +82,7 @@ socket.on("disconnect", () => {
   users.removeAllUsers();
   pieceManager.reset();
   visualHandler.deleteAll();
+  micInput.destroy();
   blipSynth.destroy();
   bwommSynth.destroy();
 });

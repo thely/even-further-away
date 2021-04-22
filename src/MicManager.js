@@ -23,6 +23,13 @@ class MicInput {
     this.id = userID;
   }
 
+  destroy() {
+    this.mic.dispose();
+    this.mult.dispose();
+    this.meter.dispose();
+    this.analysis.dispose();
+  }
+
   changeMicState(analysisCallback) {
     if (this.mic.state == "stopped") {
       Tone.context.resume();
