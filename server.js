@@ -24,10 +24,10 @@ function authenticate(req, res, next) {
 }
 
 app.set("view engine", "pug");
-app.use(authenticate);
+// app.use(authenticate);
 app.use(express.static('client'));
 
-app.get('/', (req, res) => {
+app.get('/', authenticate, (req, res) => {
   res.render('index');
 });
 
