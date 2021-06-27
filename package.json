@@ -3,12 +3,14 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
+  "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev:js": "browserify src/main.js -o client/client.js --debug --verbose -t [ babelify --presets [@babel/preset-env] ]",
     "build:js": "browserify src/main.js --debug --verbose -t [ babelify --presets [@babel/preset-env] ] -o client/client.js",
     "watch:js": "nodemon --watch 'src' --exec 'npm run build:js'",
-    "watch": "npm run watch:js & nodemon server.js",
+    "watch": "npm run watch:js & nodemon -r dotenv/config server.js",
+    "start": "npm run watch:js & nodemon -r dotenv/config server.js",
     "build": "npm run build:js",
     "serve": "node server.js"
   },

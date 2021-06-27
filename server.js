@@ -1,8 +1,20 @@
-const { speechToText, initSpeechSocket } = require("./server/speechRecognition.js");
-const express = require('express');
+import express from 'express';
+
+import { createServer } from 'http';
+import { Server } from "socket.io";
+
+import ServerPieceManager from "./server/ServerPieceManager.js";
+import { speechToText, initSpeechSocket } from "./server/speechRecognition.js";
+
 const app = express();
-const http = require('http').createServer(app);
-const io = require('socket.io')(http);
+const http = createServer();
+const io = new Server(http);
+const piece = new ServerPieceManager(pieceStateChange);
+
+function pieceStateChange(section) {
+  io.sockets.emit("serverAsTransport", section);
+  console.log(section);
+}
 
 function authenticate(req, res, next) {
   const reject = () => {
@@ -66,6 +78,7 @@ io.on("connection", async (socket) => {
   });
 
   socket.on("startTransport", () => {
+    // piece.startPiece();
     io.sockets.emit("startTransport");
   })
 
