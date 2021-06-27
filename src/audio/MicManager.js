@@ -89,9 +89,15 @@ class MicInput {
     }
 
     if (retval != "") {
-      retval.id = this.id;
-      analysisCallback(retval);
-      return retval;
+      try {
+        retval.id = this.id;
+        analysisCallback(retval);
+        return retval;
+      } catch (e) {
+        console.log("couldn't find synth?");
+        console.log(retval);
+        console.log(e);
+      }
     }
   }
 

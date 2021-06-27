@@ -43,7 +43,11 @@ class UserSynth {
       synth.volume.rampTo(msg.volume, 0.01, Tone.now() + 0.01);
     }
     if (msg.event == "start") {
-      synth.triggerAttack(msg.pitch);
+      try {
+        synth.triggerAttack(msg.pitch);
+      } catch(e) {
+        console.log("singer trigger bug – probably a start time issue");
+      }
     } else if (msg.event == "transition") {
       synth.frequency.rampTo(msg.pitch, 0.03, Tone.now() + 0.01);
     } else if (msg.event == "end") {
