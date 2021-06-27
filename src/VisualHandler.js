@@ -188,19 +188,27 @@ class VisualHandler {
   };
 
   frameFromServer(obj) {
-    const newImage = frameRender.buildFrame(obj.image);
-    if (zoomSpacer) {
-      zoomSpacer.addFrameToBlock(obj.id, newImage);
+    if (frameRender) {
+      const newImage = frameRender.buildFrame(obj.image);
+      if (zoomSpacer) {
+        zoomSpacer.addFrameToBlock(obj.id, newImage);
+      }
+    } else {
+      console.log("frameRender doesn't exist yet");
     }
   }
   
   textFromServer(msg) {
-    console.log(msg);
-    if ("speech" in msg) {
-      textRender.addText(msg);
+    if (textRender) {
+      console.log(msg);
+      if ("speech" in msg) {
+        textRender.addText(msg);
+      } else {
+        console.log("no text to put!");
+      }  
     } else {
-      console.log("no text to put!");
-    }  
+      console.log("textRender doesn't exist yet");
+    }
   }
 
   deleteAll() {

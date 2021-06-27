@@ -31,12 +31,12 @@ class ZoomLikeSpace {
   
   drawBlocks(state) {
     for (let i = 0; i < this.blocks.length; i++) {
-      // p.rect(
-      //   this.blocks[i].x,
-      //   this.blocks[i].y,
-      //   this.blocks[i].w,
-      //   this.blocks[i].h
-      // );
+      p.rect(
+        this.blocks[i].x,
+        this.blocks[i].y,
+        this.blocks[i].w,
+        this.blocks[i].h
+      );
 
       if ("img" in this.blocks[i] && !this.blocks[i].seen) {
         const block = this.blocks[i];
@@ -116,7 +116,7 @@ class ZoomLikeSpace {
       }
     }
 
-    // console.log(this.blocks);
+    console.log(this.blocks);
     return this.blocks;
   }
 
