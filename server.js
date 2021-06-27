@@ -1,22 +1,11 @@
-import express from 'express';
-
-import { createServer } from 'http';
-import { Server } from "socket.io";
-
-import ServerPieceManager from "./server/ServerPieceManager.js";
-import { speechToText, initSpeechSocket } from "./server/speechRecognition.js";
-
+const { speechToText, initSpeechSocket } = require("./server/speechRecognition.js");
+const express = require('express');
 const app = express();
-const http = createServer();
-const io = new Server(http);
-const piece = new ServerPieceManager(pieceStateChange);
-
-function pieceStateChange(section) {
-  io.sockets.emit("serverAsTransport", section);
-  console.log(section);
-}
+const http = require('http').createServer(app);
+const io = require('socket.io')(http);
 
 function authenticate(req, res, next) {
+  console.log("hello??");
   const reject = () => {
     res.setHeader('www-authenticate', 'Basic');
     res.sendStatus(401);
@@ -40,6 +29,7 @@ app.set("view engine", "pug");
 app.use(express.static('client'));
 
 app.get('/', authenticate, (req, res) => {
+  console.log("hello!!!!");
   res.render('index');
 });
 
