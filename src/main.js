@@ -45,6 +45,11 @@ socket.on("viewerConnect", (ids) => {
   pieceManager.registerListener(users);
 
   updateUserCount();
+
+  document.querySelector("#indiv-canvas").addEventListener("click", async () => {
+    // console.log("clicked the canvas!");
+    await startAudio();
+  }, { once: true });
 });
 
 socket.on("selfConnect", (ids) => {
@@ -84,10 +89,12 @@ socket.on("userDisconnect", (id) => {
 });
 
 socket.on("disconnect", () => {
+  if (micInput) {
+    micInput.destroy();
+  }
   users.removeAllUsers();
   pieceManager.reset();
   visualHandler.deleteAll();
-  micInput.destroy();
   blipSynth.destroy();
   bwommSynth.destroy();
 });
@@ -124,11 +131,16 @@ function updateUserCount() {
 // Transport
 // ~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-
 
-document.querySelector(".init-audio").addEventListener("click", (e) => {
+async function startAudio() {
+  console.log("initialized!");
+  await Tone.start();
+  Tone.context.resume();
+  Tone.Transport.start();
+}
+
+document.querySelector(".init-audio").addEventListener("click", async (e) => {
   try {
-    console.log("initialized!");
-    Tone.context.resume();
-    Tone.Transport.start();
+    await startAudio();
     e.target.style.backgroundColor = "lightgreen";
     e.target.disabled = true;
   } catch(err) {
