@@ -114,10 +114,10 @@ const sketch = (p) => {
     counter++;
     sendCounter++;
     
-    let fps = p.frameRate();
-  p.fill(255);
-  p.stroke(0);
-  p.text("FPS: " + fps.toFixed(2), 10, p.height - 10);
+  //   let fps = p.frameRate();
+  // p.fill(255);
+  // p.stroke(0);
+  // p.text("FPS: " + fps.toFixed(2), 10, p.height - 10);
   }
   p.doubleClicked = () => {
     if (p.mouseX > 0 && p.mouseX < p.width && p.mouseY > 0 && p.mouseY < p.height) {
