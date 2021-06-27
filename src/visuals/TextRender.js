@@ -46,6 +46,7 @@ class TextRender {
   }
 
   drawText(obj) {
+    if (!obj) { return; }
     const points = obj.points;
     p.stroke(obj.stroke);
     p.fill(obj.fill);
@@ -82,6 +83,7 @@ class TextRender {
 
   reset() {
     this.texts = [];
+    this.index = 0;
   }
 
   handleStateChange(state) {

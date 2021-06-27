@@ -4,13 +4,13 @@ import * as Tone from 'tone';
 // import { updateMeterCount } from "./controls.js";
 import MeterBlock from "./controls.js";
 import VisualHandler from "./VisualHandler.js";
-import MicInput from './MicManager.js';
+import MicInput from './audio/MicManager.js';
 // import UserSynth from './UserSynth.js';
-import PatternBuilder from './PatternBuilder.js';
-import BlipSynth from './BlipSynth.js';
+import PatternBuilder from './audio/PatternBuilder.js';
+import BlipSynth from './audio/BlipSynth.js';
 import PieceManager from './PieceManager.js';
-import UserList from './UserList.js';
-import BwommSynth from './BwommSynth.js';
+import UserList from './audio/UserList.js';
+import BwommSynth from './audio/BwommSynth.js';
 
 Tone.setContext(new Tone.Context({
   latencyHint: "balanced",
@@ -126,6 +126,7 @@ document.querySelector(".init-audio").addEventListener("click", (e) => {
   try {
     console.log("initialized!");
     Tone.context.resume();
+    Tone.Transport.start();
     e.target.style.backgroundColor = "lightgreen";
     e.target.disabled = true;
   } catch(err) {
@@ -145,6 +146,11 @@ stopButton.addEventListener("click", () => {
   socket.emit("stopTransport");
 });
 
+const testState = document.querySelector(".default-state");
+testState.addEventListener("click", () => {
+  socket.emit("defaultTestState");
+});
+
 socket.on("startTransport", () => {
   console.log("starting transport");
   pieceManager.startPiece();
@@ -154,8 +160,18 @@ socket.on("startTransport", () => {
 });
 
 socket.on("stopTransport", () => {
+  console.log("stop transport");
   pieceManager.stopPiece();
   visualHandler.fadeOut();
+  startButton.style.backgroundColor = "";
+  startButton.disabled = false;
+});
+
+socket.on("defaultTestState", () => {
+  console.log("prime piece");
+  // Tone.getDestination().volume.rampTo(0, 1);
+  pieceManager.primePiece();
+  visualHandler.clearBoard();
   startButton.style.backgroundColor = "";
   startButton.disabled = false;
 });

@@ -76,6 +76,10 @@ io.on("connection", async (socket) => {
     io.sockets.emit("stopTransport");
   });
 
+  socket.on("defaultTestState", () => {
+    io.sockets.emit("defaultTestState");
+  }) 
+
   // ~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-
   // Pitch + Speech
   // ~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-

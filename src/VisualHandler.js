@@ -216,10 +216,12 @@ class VisualHandler {
   }
 
   fadeOut() {
+    console.log("fading out");
     this.finished = true;
   }
 
   clearBoard() {
+    console.log("clearing board");
     this.finished = false;
     doneCounter = 0;
     textRender.reset();

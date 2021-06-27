@@ -48,7 +48,7 @@ class PieceManager {
 
   stopPiece() {
     Tone.Transport.cancel(0);
-    Tone.Transport.stop(Tone.now());
+    // Tone.Transport.stop(Tone.now());
     Tone.Transport.position = "0:0:00";
     Tone.getDestination().volume.rampTo(-Infinity, 5);
     this.sectionIndex = 0;
@@ -57,9 +57,17 @@ class PieceManager {
     // this.socket.pieceTime = Tone.Transport.position;
   }
 
+  primePiece() {
+    Tone.getDestination().volume.rampTo(0, 1);
+    Tone.Transport.position = "0:0:00";
+    this.inProgress = false;
+  }
+
   startPiece() {
     Tone.getDestination().volume.rampTo(0, 1);
-    Tone.Transport.start(Tone.now());
+    // Tone.Transport.start()
+    Tone.Transport.position = "0:0:00";
+    // Tone.Transport.start(Tone.now());
     this.sectionIndex = 0;
     this.inProgress = true;
 
