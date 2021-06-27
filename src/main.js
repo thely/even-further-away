@@ -12,6 +12,9 @@ import PieceManager from './PieceManager.js';
 import UserList from './UserList.js';
 import BwommSynth from './BwommSynth.js';
 
+Tone.setContext(new Tone.Context({
+  latencyHint: "balanced",
+}));
 
 const io = require('socket.io-client');
 var socket = io(process.env.SOCKET_URL);
@@ -26,12 +29,12 @@ let notes = ["C", "D", "E", "F", "G", "A"];
 
 socket.on("viewerConnect", (ids) => {
   clearOldCanvas();
-  users = new UserList({ "viewer": true });
+  users = new UserList({ "viewer": true }, Tone);
   users.resetUserList(ids);
 
-  blipSynth = new BlipSynth();
-  bwommSynth = new BwommSynth();
-  pieceManager = new PieceManager(socket);
+  blipSynth = new BlipSynth(Tone);
+  bwommSynth = new BwommSynth(Tone);
+  pieceManager = new PieceManager(socket, Tone);
   meterBlock = new MeterBlock();
   visualHandler = new VisualHandler("indiv-canvas", socket, { "viewer": true });
 
@@ -45,14 +48,14 @@ socket.on("viewerConnect", (ids) => {
 
 socket.on("selfConnect", (ids) => {
   clearOldCanvas();
-  users = new UserList();
+  users = new UserList(null, Tone);
   users.resetUserList(ids);
 
-  micInput = new MicInput(ids.self);
-  blipSynth = new BlipSynth();
-  bwommSynth = new BwommSynth();
-  pieceManager = new PieceManager(socket);
-  meterBlock = new MeterBlock();
+  micInput = new MicInput(ids.self, Tone);
+  blipSynth = new BlipSynth(Tone);
+  bwommSynth = new BwommSynth(Tone);
+  pieceManager = new PieceManager(socket, Tone);
+  meterBlock = new MeterBlock(Tone);
   visualHandler = new VisualHandler("indiv-canvas", socket);
 
   pieceManager.registerListener(blipSynth);
@@ -144,7 +147,7 @@ stopButton.addEventListener("click", () => {
 
 socket.on("startTransport", () => {
   console.log("starting transport");
-  pieceManager.startPiece(blipSynth);
+  pieceManager.startPiece();
   visualHandler.clearBoard();
   startButton.style.backgroundColor = "lightgreen";
   startButton.disabled = true;
@@ -153,9 +156,13 @@ socket.on("startTransport", () => {
 socket.on("stopTransport", () => {
   pieceManager.stopPiece();
   visualHandler.fadeOut();
+  startButton.style.backgroundColor = "";
   startButton.disabled = false;
 });
 
+socket.on("serverAsTransport", (section) => {
+  console.log(section);
+});
 
 // ~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-
 // Microphone

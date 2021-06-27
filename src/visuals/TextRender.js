@@ -80,6 +80,10 @@ class TextRender {
     p.pop();
   }
 
+  reset() {
+    this.texts = [];
+  }
+
   handleStateChange(state) {
     // this.state = state;
     if ("text" in state) {

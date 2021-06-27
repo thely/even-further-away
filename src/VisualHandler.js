@@ -114,6 +114,10 @@ const sketch = (p) => {
     counter++;
     sendCounter++;
     
+    let fps = p.frameRate();
+  p.fill(255);
+  p.stroke(0);
+  p.text("FPS: " + fps.toFixed(2), 10, p.height - 10);
   }
   p.doubleClicked = () => {
     if (p.mouseX > 0 && p.mouseX < p.width && p.mouseY > 0 && p.mouseY < p.height) {
@@ -204,6 +208,11 @@ class VisualHandler {
     if (zoomSpacer) {
       zoomSpacer.deleteAll();
     }
+    textRender.reset();
+  }
+
+  reset() {
+    textRender.reset();
   }
 
   fadeOut() {
@@ -213,6 +222,7 @@ class VisualHandler {
   clearBoard() {
     this.finished = false;
     doneCounter = 0;
+    textRender.reset();
     s.background(50);
     s.loop();
   }
