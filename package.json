@@ -2,8 +2,7 @@
   "name": "over-over",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
-  "type": "module",
+  "main": "server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev:js": "browserify src/main.js -o client/client.js --debug --verbose -t [ babelify --presets [@babel/preset-env] ]",
@@ -12,7 +11,7 @@
     "watch": "npm run watch:js & nodemon -r dotenv/config server.js",
     "start": "npm run watch:js & nodemon -r dotenv/config server.js",
     "build": "npm run build:js",
-    "serve": "node server.js"
+    "serve": "node -r dotenv/config server.js"
   },
   "author": "",
   "license": "ISC",
