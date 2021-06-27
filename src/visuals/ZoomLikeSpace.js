@@ -31,12 +31,12 @@ class ZoomLikeSpace {
   
   drawBlocks(state) {
     for (let i = 0; i < this.blocks.length; i++) {
-      p.rect(
-        this.blocks[i].x,
-        this.blocks[i].y,
-        this.blocks[i].w,
-        this.blocks[i].h
-      );
+      // p.rect(
+      //   this.blocks[i].x,
+      //   this.blocks[i].y,
+      //   this.blocks[i].w,
+      //   this.blocks[i].h
+      // );
 
       if ("img" in this.blocks[i] && !this.blocks[i].seen) {
         const block = this.blocks[i];
@@ -91,7 +91,7 @@ class ZoomLikeSpace {
       for (let j = 0; j < dims.cols; j++) {
         let xVal;
   
-        if (this.isRemainingBlock(dims, index)) {
+        if (this.isRemainingBlock(dims, index, count)) {
           xVal = this.leftoverBlock(index, remainingTotal, count, blockW);
         } else {
           xVal = blockW * j + this.gap * j;  
@@ -116,7 +116,7 @@ class ZoomLikeSpace {
       }
     }
 
-    console.log(this.blocks);
+    // console.log(this.blocks);
     return this.blocks;
   }
 
@@ -128,11 +128,12 @@ class ZoomLikeSpace {
     return 0;
   }
 
-  isRemainingBlock(dims, index) {
-    if (dims.cols * dims.rows <= 2) {
+  isRemainingBlock(dims, index, count) {
+    if (dims.cols * dims.rows <= 2) { // for two people: ignore this
       return false;
     }
-    return dims.cols * dims.rows - index < dims.cols + 1;
+    // return dims.cols * dims.rows - index < dims.cols + 1;
+    return dims.cols * dims.rows > count && index >= dims.cols * (dims.rows - 1);
   }
 
   leftoverBlock(index, remaining, total, blockW) {
