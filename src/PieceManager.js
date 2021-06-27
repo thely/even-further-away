@@ -58,6 +58,7 @@ class PieceManager {
   }
 
   primePiece() {
+    Tone.Transport.cancel(0);
     Tone.getDestination().volume.rampTo(0, 1);
     Tone.Transport.position = "0:0:00";
     this.inProgress = false;

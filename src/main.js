@@ -28,6 +28,7 @@ let notes = ["C", "D", "E", "F", "G", "A"];
 // ~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-
 
 socket.on("viewerConnect", (ids) => {
+  console.log("viewer connected");
   clearOldCanvas();
   users = new UserList({ "viewer": true }, Tone);
   users.resetUserList(ids);
@@ -47,6 +48,7 @@ socket.on("viewerConnect", (ids) => {
 });
 
 socket.on("selfConnect", (ids) => {
+  console.log("self connected");
   clearOldCanvas();
   users = new UserList(null, Tone);
   users.resetUserList(ids);
