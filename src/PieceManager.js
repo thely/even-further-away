@@ -1,30 +1,105 @@
-import * as Tone from "tone";
+// import * as Tone from "tone";
+let Tone;
 
 class PieceManager {
-  constructor(socket) {
-    this.flags = {
-      useRepeater: false,
-      noiseWhileSpeaking: false,
-      noiseAsBGBursts: false,
-    };
-
+  constructor(socket, toneRef) {
+    Tone = toneRef;
     this.socket = socket;
     this.inProgress = false;
 
     this.sectionIndex = 0;
-    this.state = [
+    this.state = this.buildState();
+
+    this.listeners = [];
+    this.dirBox = document.querySelector(".directions");
+  }
+
+  notifyListeners(section) {
+    for (const listen of this.listeners) {
+      listen.handleStateChange(section);
+    }
+  }
+
+  registerListener(listen) {
+    this.listeners.push(listen);
+  }
+
+  reset() {
+    this.listeners = [];
+    this.sectionIndex = 0;
+  }
+
+  pieceText(text) {
+    this.dirBox.innerHTML = text;
+  }
+
+  makeSection(section, t) {
+    let startTime = (t == null) ? section.when : t;
+
+    Tone.Transport.scheduleOnce((time) => {
+      console.log(section);
+      if ("instructions" in section) {
+        this.dirBox.innerHTML = section.instructions;
+      }
+      this.notifyListeners(section);
+      this.sectionIndex++;
+    }, startTime);
+  }
+
+  stopPiece() {
+    Tone.Transport.cancel(0);
+    Tone.Transport.stop(Tone.now());
+    Tone.Transport.position = "0:0:00";
+    Tone.getDestination().volume.rampTo(-Infinity, 5);
+    this.sectionIndex = 0;
+    
+    this.inProgress = false;
+    // this.socket.pieceTime = Tone.Transport.position;
+  }
+
+  startPiece() {
+    Tone.getDestination().volume.rampTo(0, 1);
+    Tone.Transport.start(Tone.now());
+    this.sectionIndex = 0;
+    this.inProgress = true;
+
+    for (const section of this.state) {
+      this.makeSection(section);
+    }
+  }
+
+  joinOngoing(state) {
+    if (state.ongoing) {
+      console.log(state);
+      this.inProgress = true;
+      this.sectionIndex = state.section - 1;
+      Tone.Transport.position = state.position;
+
+      for (let i = 0; i < this.state.length; i++) {
+        if (i > this.sectionIndex) {
+          this.makeSection(this.state[i]);
+        } else if (i == this.sectionIndex) {
+          this.makeSection(this.state[i], Tone.now());
+        }
+      }
+
+      Tone.Transport.start(0.1, state.position);
+    } else {
+      console.log("piece not started yet");
+    }
+  }
+
+  buildState() {
+    return [
       { //small talk
         when: 0.1,
         duration: 60,
         zoom: { style: "normal" },
         textOffset: 40,  
         textRotation: -32.0,
+        repeater: { frequency: "3m" },
         textDeviance: 2,
         text: { offset: 40, rotation: -32.0, deviance: 1 },
-        // textLossyThresh: 5,
-        // tinyBlocks: true,
-        // repeater: { frequency: "3m" },
-        repeater: { frequency: "3m" },
         blip: { max: 3, prob: 7, when: 0.1, duration: 60, frequency: "1n" },
         // bwomm: true,
         instructions: `
@@ -45,9 +120,6 @@ class PieceManager {
         repeater: { frequency: "3m" },
         useBlip: true,
         text: { offset: 40, rotation: -32.0, lossyThresh: 9, deviance: 2 },
-        // textOffset: 40,  
-        // textRotation: -32.0,
-        // textLossyThresh: 9,
         blip: { max: 5, prob: 6, when: 65.1, duration: 60, frequency: "1n" },
         instructions: `
           Discuss your actual schedule in short bursts, like 'I work 9 to 5' or
@@ -167,86 +239,6 @@ class PieceManager {
         `
       },
     ];
-
-    this.listeners = [];
-    this.dirBox = document.querySelector(".directions");
-  }
-
-  notifyListeners(section) {
-    for (const listen of this.listeners) {
-      listen.handleStateChange(section);
-    }
-  }
-
-  registerListener(listen) {
-    this.listeners.push(listen);
-  }
-
-  reset() {
-    this.listeners = [];
-    this.sectionIndex = 0;
-
-    // this.socket.inProgress = false;
-  }
-
-  pieceText(text) {
-    this.dirBox.innerHTML = text;
-  }
-
-  makeSection(section, t) {
-    let startTime = (t == null) ? section.when : t;
-
-    Tone.Transport.scheduleOnce((time) => {
-      console.log(section);
-      if ("instructions" in section) {
-        this.dirBox.innerHTML = section.instructions;
-      }
-      this.notifyListeners(section);
-      this.sectionIndex++;
-    }, startTime);
-  }
-
-  stopPiece() {
-    Tone.Transport.cancel(0);
-    Tone.Transport.stop(Tone.now());
-    Tone.Transport.position = "0:0:00";
-    Tone.getDestination().volume.rampTo(-Infinity, 5);
-    this.sectionIndex = 0;
-    
-    this.inProgress = false;
-    // this.socket.pieceTime = Tone.Transport.position;
-  }
-
-  startPiece(blipSynth) {
-    Tone.getDestination().volume.rampTo(0, 1);
-    Tone.Transport.start(Tone.now());
-    this.sectionIndex = 0;
-    this.inProgress = true;
-
-    for (const section of this.state) {
-      this.makeSection(section);
-    }
-  }
-
-  joinOngoing(state) {
-    if (state.ongoing) {
-      console.log(state);
-      this.inProgress = true;
-      this.sectionIndex = state.section - 1;
-      Tone.Transport.position = state.position;
-
-      for (let i = 0; i < this.state.length; i++) {
-        if (i > this.sectionIndex) {
-          this.makeSection(this.state[i]);
-        } else if (i == this.sectionIndex) {
-          this.makeSection(this.state[i], Tone.now());
-        }
-      }
-
-      Tone.Transport.start(0.1, state.position);
-    } else {
-      console.log("piece not started yet");
-    }
   }
 }
 

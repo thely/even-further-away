@@ -1,7 +1,11 @@
-import * as Tone from "tone";
+// import * as Tone from "tone";
+let Tone;
 
 class BlipSynth {
-  constructor() {
+  constructor(toneRef) {
+    // console.log(toneRef);
+    Tone = toneRef;
+    console.log(Tone);
     this.buildBlip();
     this.burst = {
       happening: false,
@@ -15,8 +19,9 @@ class BlipSynth {
     this.synth = new Tone.NoiseSynth({ volume: -20 });
     this.filter = new Tone.Filter(8000, "highpass");
     this.bitcrush = new Tone.BitCrusher(4);
-    this.autoPanner = new Tone.AutoPanner("1n");
-    this.synth.chain(this.bitcrush, this.filter, this.autoPanner, Tone.Destination);
+    this.autoPanner = new Tone.AutoPanner("1n").toDestination();
+    console.log("prov?");
+    this.synth.chain(this.bitcrush, this.filter, this.autoPanner);
   }
 
   playBlip(time) {

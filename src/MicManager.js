@@ -1,10 +1,12 @@
-import * as Tone from "tone";
+// import * as Tone from "tone";
 import { randomInRange } from "./utils.js";
 const { detect } = require('detect-browser');
 const Pitchfinder = require("pitchfinder");
+let Tone;
 
 class MicInput {
-  constructor(userID) {
+  constructor(userID, toneRef) {
+    Tone = toneRef;
     this.mic = new Tone.UserMedia();
     this.mult = new Tone.Multiply(12);
     this.meter = new Tone.Meter();

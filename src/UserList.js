@@ -1,8 +1,10 @@
 import UserSynth from './UserSynth.js';
 import { linspace } from "./utils.js";
+let Tone;
 
 class UserList {
-  constructor(options) {
+  constructor(options, toneRef) {
+    Tone = toneRef;
     this.users = {};
     this.selfID = "";
     this.keys = [];
@@ -24,7 +26,7 @@ class UserList {
   newUser(id) {
     this.keys.push(id);
     this.users[id] = {};
-    this.users[id].synth = new UserSynth(id);
+    this.users[id].synth = new UserSynth(id, Tone);
     return this.users[id];
   }
 

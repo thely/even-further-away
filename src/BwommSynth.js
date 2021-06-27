@@ -1,7 +1,9 @@
-import * as Tone from "tone";
+// import * as Tone from "tone";
+let Tone;
 
 class BwommSynth {
-  constructor() {
+  constructor(toneRef) {
+    Tone = toneRef;
     this.buildBwomm();
     console.log("bwomm constructed");
   }
@@ -44,9 +46,9 @@ class BwommSynth {
       },
       "modulationIndex": 10
     });
-    this.autoFilter = new Tone.AutoFilter("4n");
+    this.autoFilter = new Tone.AutoFilter("4n").toDestination();
     // route an oscillator through the filter and start it
-    this.synth.chain(this.autoFilter, Tone.Destination);
+    this.synth.chain(this.autoFilter);
     // this.synth = new Tone.NoiseSynth({ volume: -20 });
     // this.filter = new Tone.Filter(8000, "highpass");
     // this.bitcrush = new Tone.BitCrusher(4);

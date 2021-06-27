@@ -1,13 +1,17 @@
-import * as Tone from "tone";
+// import * as Tone from "tone";
 const { updateSingleMeter } = require("./controls.js");
+let Tone;
 
 class UserSynth {
-  constructor(id) {
+  constructor(id, toneRef) {
+    console.log(toneRef);
     this.id = id;
+    Tone = toneRef;
     this.singer = this.buildSinger();
     this.repeater = this.buildRepeater();
     this.repeaterEvent = -1;
     this.state = {};
+
   }
 
   destroy() {
@@ -126,15 +130,6 @@ class UserSynth {
         releaseCurve: "exponential",
         sustain: 1
       },
-      modulationEnvelope: {
-        attack: 0.1,
-        attackCurve: "linear",
-        decay: 0.1,
-        decayCurve: "exponential",
-        release: 1,
-        releaseCurve: "exponential",
-        sustain: 1
-      },
     });
     const filter = new Tone.Filter({
       frequency: 2000, 
@@ -143,13 +138,12 @@ class UserSynth {
       rolloff: -24
     });
     const bitcrush = new Tone.Distortion(0.5);
-    // const mult = new Tone.Multiply(1.0);
-    const comp = new Tone.Compressor(-20, 2);
-    const chorus = new Tone.Chorus(4, 2.5, 0.5);
+    // const comp = new Tone.Compressor(-20, 2);
+    // const chorus = new Tone.Chorus(4, 2.5, 0.5);
     const mult = new Tone.Multiply(3);
     const channel = new Tone.Channel(-12, -0.2).toDestination();
     const meter = new Tone.Meter({ channels: 2 });
-    synth.chain(bitcrush, filter, comp, chorus, mult, channel);
+    synth.chain(bitcrush, filter, mult, channel);
     channel.connect(meter);
 
     return { 
@@ -157,8 +151,8 @@ class UserSynth {
       distortion: bitcrush, 
       filter: filter, 
       channel: channel, 
-      comp: comp, 
-      chorus: chorus,
+      // comp: comp, 
+      // chorus: chorus,
       meter: meter
     };
   }
