@@ -5,7 +5,6 @@ class BwommSynth {
   constructor(toneRef) {
     Tone = toneRef;
     this.buildBwomm();
-    console.log("bwomm constructed");
   }
 
   buildBwomm() {

@@ -3,9 +3,7 @@ let Tone;
 
 class BlipSynth {
   constructor(toneRef) {
-    // console.log(toneRef);
     Tone = toneRef;
-    console.log(Tone);
     this.buildBlip();
     this.burst = {
       happening: false,

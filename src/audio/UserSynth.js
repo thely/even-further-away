@@ -4,9 +4,8 @@ let Tone;
 
 class UserSynth {
   constructor(id, toneRef) {
-    console.log(toneRef);
-    this.id = id;
     Tone = toneRef;
+    this.id = id;
     this.singer = this.buildSinger();
     this.repeater = this.buildRepeater();
     this.repeaterEvent = -1;
