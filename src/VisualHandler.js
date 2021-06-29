@@ -70,6 +70,13 @@ const sketch = (p) => {
       zoomSpacer.generateBlocks(parentObj.userKeys);
     }
 
+    if (parentObj.starterFrames) {
+      for (let key of Object.keys(parentObj.starterFrames)) {
+        const newImage = frameRender.buildFrame(parentObj.starterFrames[key]);
+        zoomSpacer.addFrameToBlock(key, newImage);
+      }      
+    }
+
     p.background(50);
     p.noSmooth();
     doneCounter = 0;
@@ -150,11 +157,16 @@ class VisualHandler {
     parentObj = this;
     this.socket = socket;
     this.finished = false;
+    this.starterFrames = [];
     if (options != null && "viewer" in options) {
       this.viewer = true;
       isReady = true;
     } else {
       this.viewer = false;
+    }
+
+    if (options != null && "images" in options && options.images != []) {
+      this.starterFrames = options.images;
     }
 
     new p5(sketch, canvasID);

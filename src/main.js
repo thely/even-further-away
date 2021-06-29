@@ -37,7 +37,7 @@ socket.on("viewerConnect", (ids) => {
   bwommSynth = new BwommSynth(Tone);
   pieceManager = new PieceManager(socket, Tone);
   meterBlock = new MeterBlock();
-  visualHandler = new VisualHandler("indiv-canvas", socket, { "viewer": true });
+  visualHandler = new VisualHandler("indiv-canvas", socket, { "viewer": true, images: ids.images });
 
   pieceManager.registerListener(blipSynth);
   pieceManager.registerListener(bwommSynth);
@@ -53,6 +53,7 @@ socket.on("viewerConnect", (ids) => {
 });
 
 socket.on("selfConnect", (ids) => {
+  console.log(ids);
   console.log("self connected");
   clearOldCanvas();
   users = new UserList(null, Tone);
@@ -63,7 +64,7 @@ socket.on("selfConnect", (ids) => {
   bwommSynth = new BwommSynth(Tone);
   pieceManager = new PieceManager(socket, Tone);
   meterBlock = new MeterBlock(Tone);
-  visualHandler = new VisualHandler("indiv-canvas", socket);
+  visualHandler = new VisualHandler("indiv-canvas", socket, { images: ids.images });
 
   pieceManager.registerListener(blipSynth);
   pieceManager.registerListener(bwommSynth);
@@ -242,6 +243,7 @@ document.addEventListener('keydown', (e) => {
 
 document.addEventListener('keyup', async (e) => {
   if (e.code == "Space") {
+    console.log("make blob for speech recognition??");
     const blob = await micInput.stopRecording();
     socket.emit("speechRecognition", blob);
 

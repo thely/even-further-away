@@ -37,17 +37,31 @@ app.get('/viewer', (req, res) => {
   res.render('viewer');
 });
 
+function getLastImages() {
+  let retval = {};
+  for (const [_, socket] of io.of("/").sockets) {
+    if (socket.rooms.has("performers") && "lastImage" in socket) {
+      retval[socket.id] = socket.lastImage;
+    }
+  }
+
+  console.log(retval);
+  return retval;
+}
+
 io.on("connection", async (socket) => {
   const room = socket.handshake.headers.referer.includes("viewer") ? "viewers" : "performers";
   socket.join(room);
 
   const performers = Array.from(await io.in("performers").allSockets());
+  const images = getLastImages();
 
   if (room == "performers") {
-    socket.emit("selfConnect", { self: socket.id, users: performers });
+    console.log({ self: socket.id, users: performers, images: images });
+    socket.emit("selfConnect", { self: socket.id, users: performers, images: images });
     socket.broadcast.emit("userConnect", socket.id);
   } else {
-    socket.emit("viewerConnect", { users: performers });
+    socket.emit("viewerConnect", { users: performers, images: images });
   }
 
   if (performers.length > 1) {
@@ -124,7 +138,8 @@ io.on("connection", async (socket) => {
   
   socket.on("newPicture", (msg) => {
     socket.broadcast.emit("newPicture", msg);
-    // console.log(msg.image);
+    socket.lastImage = msg.image;
+    // io.sockets.sockets.get(msg.id)["lastImage"] = msg.image;
   });
 
   // ~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-
@@ -133,8 +148,11 @@ io.on("connection", async (socket) => {
 
   socket.on('disconnect', async () => {
     // const sockets = Array.from(await io.allSockets());
+    const perfs = Array.from(await io.in("performers").allSockets());
+
     if (room == "performers") {
       socket.broadcast.emit("userDisconnect", socket.id);
+      console.log("numsockets: " + perfs.length);
     }
     // console.log("numsockets: " + sockets.length);
   });
